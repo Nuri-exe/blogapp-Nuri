@@ -5,7 +5,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
   selector: 'app-root',
   imports: [RouterOutlet, MatToolbarModule],
   templateUrl: './app.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './app.scss',
 })
 export class App {
