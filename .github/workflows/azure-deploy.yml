@@ -34,7 +34,7 @@ jobs:
         run: npm run build
 
       - name: Upload to Azure Storage ($web)
-        uses: azure/CLI@v2
+        uses: azure/CLI@v3
         with:
           azcliversion: latest
           inlineScript: |
