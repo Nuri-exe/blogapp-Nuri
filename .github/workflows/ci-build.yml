@@ -15,6 +15,10 @@ env:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    # Browsers + system deps are prebaked into this image, so there is no
+    # `playwright install` step (the part that was hanging). Keep this tag in
+    # sync with the @playwright/test version in package.json.
+    container: mcr.microsoft.com/playwright:v1.58.2-noble
 
     steps:
       - uses: actions/checkout@v6
@@ -34,21 +38,6 @@ jobs:
 
       - name: Build
         run: npm run build
-
-      - name: Cache Playwright Browsers
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ hashFiles('**/package-lock.json') }}-chromium
-
-      - name: Install Playwright Browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
-
-      - name: Install Playwright System Dependencies
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
 
       - name: E2E Tests
         run: npm run e2e
