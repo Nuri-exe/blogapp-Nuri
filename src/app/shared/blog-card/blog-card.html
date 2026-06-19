@@ -1,0 +1,27 @@
+<mat-card class="blog-card" appearance="outlined">
+  @if (model().headerImageUrl) {
+    <img mat-card-image [src]="model().headerImageUrl" [alt]="model().title" />
+  }
+
+  <mat-card-header>
+    <mat-card-title>{{ model().title }}</mat-card-title>
+    <mat-card-subtitle>von {{ model().author }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <p>{{ model().contentPreview }}</p>
+  </mat-card-content>
+
+  <mat-card-actions align="start">
+    <button
+      mat-icon-button
+      (click)="onLike()"
+      [attr.aria-label]="model().likedByMe ? 'Like entfernen' : 'Liken'"
+    >
+      <mat-icon [class.liked]="model().likedByMe">
+        {{ model().likedByMe ? 'favorite' : 'favorite_border' }}
+      </mat-icon>
+    </button>
+    <span class="like-count">{{ model().likes }}</span>
+  </mat-card-actions>
+</mat-card>

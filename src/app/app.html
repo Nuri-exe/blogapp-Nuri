@@ -4,45 +4,5 @@
 </mat-toolbar>
 
 <main class="content">
-  @if (true) {
-    <div class="welcome-card">
-      <h1>Willkommen zum Angular-Projekttemplate</h1>
-      <p>
-        Dieses Template ist dein Startpunkt für die Blog-Applikation im Modul
-        <strong>IN353 Web Applications</strong>. Es enthält bereits das gesamte Tooling (ESLint,
-        Prettier, Husky, Commitlint) und ein Angular Material Theme.
-      </p>
-
-      <h2>Quick Start</h2>
-      <ol>
-        <li><code>ng serve</code> &mdash; App lokal starten</li>
-        <li>
-          Ordnerstruktur erkunden: <code>src/app/core</code>, <code>src/app/feature</code>,
-          <code>src/app/shared</code>
-        </li>
-        <li>
-          <code>ng generate component feature/my-feature</code> &mdash; Neue Komponente erstellen
-        </li>
-        <li><code>npm run lint</code> &mdash; Code prüfen</li>
-        <li><code>npm test</code> &mdash; Tests ausführen</li>
-      </ol>
-
-      <h2>Projektstruktur</h2>
-      <pre><code>src/app/
-├── core/       &larr; Singleton Services, Guards, Interceptors
-├── feature/    &larr; Lazy-loaded Feature-Komponenten
-└── shared/     &larr; Wiederverwendbare Components, Pipes, Directives</code></pre>
-
-      <h2>Nützliche Links</h2>
-      <ul>
-        <li><a href="https://angular.dev" target="_blank" rel="noopener">Angular Docs</a></li>
-        <li>
-          <a href="https://material.angular.io" target="_blank" rel="noopener">Angular Material</a>
-        </li>
-        <li><a href="https://vitest.dev" target="_blank" rel="noopener">Vitest</a></li>
-      </ul>
-    </div>
-  }
-
   <router-outlet />
 </main>

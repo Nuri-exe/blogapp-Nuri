@@ -1,0 +1,11 @@
+<section class="blog-overview">
+  <h1>Blog-Posts</h1>
+
+  <div class="blog-grid">
+    @for (blog of blogs(); track blog.id) {
+      <app-blog-card [model]="blog" (liked)="onLiked($event)" />
+    } @empty {
+      <p class="empty-state">Noch keine Blog-Posts vorhanden.</p>
+    }
+  </div>
+</section>
