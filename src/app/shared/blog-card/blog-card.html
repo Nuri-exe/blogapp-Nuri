@@ -4,7 +4,9 @@
   }
 
   <mat-card-header>
-    <mat-card-title>{{ model().title }}</mat-card-title>
+    <mat-card-title>
+      <a [routerLink]="['/blog', model().id]">{{ model().title }}</a>
+    </mat-card-title>
     <mat-card-subtitle>von {{ model().author }}</mat-card-subtitle>
   </mat-card-header>
 

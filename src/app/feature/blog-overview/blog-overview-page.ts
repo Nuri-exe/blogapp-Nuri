@@ -1,7 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { BlogCard } from '../../shared/blog-card/blog-card';
 import { Blog } from '../../shared/blog-card/blog.model';
-import blogData from '../../data/blogs.json';
+import { BlogService } from '../../shared/blog.service';
 
 @Component({
   selector: 'app-blog-overview-page',
@@ -10,8 +10,11 @@ import blogData from '../../data/blogs.json';
   styleUrl: './blog-overview-page.scss',
 })
 export class BlogOverviewPage {
-  // Daten aus JSON laden und in ein Signal packen, damit Updates reaktiv sind
-  protected readonly blogs = signal<Blog[]>(blogData as Blog[]);
+  // Service injizieren statt JSON direkt zu importieren
+  private readonly blogService = inject(BlogService);
+
+  // Daten aus dem Service holen und in ein Signal packen, damit Updates reaktiv sind
+  protected readonly blogs = signal<Blog[]>(this.blogService.getAll());
 
   // Event-Handler: empfaengt die Blog-ID vom Child und togglet den Like-Status
   protected onLiked(id: number): void {

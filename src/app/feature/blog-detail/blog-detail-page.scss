@@ -1,0 +1,20 @@
+.blog-detail {
+  padding: 1.5rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.blog-detail a[mat-button] {
+  margin-bottom: 1rem;
+}
+
+.meta {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+.not-found {
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.6);
+}

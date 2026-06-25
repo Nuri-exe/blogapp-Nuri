@@ -1,0 +1,26 @@
+<section class="blog-detail">
+  <a routerLink="/" mat-button>
+    <mat-icon>arrow_back</mat-icon>
+    Zurück zur Übersicht
+  </a>
+
+  @if (blog(); as post) {
+    <mat-card appearance="outlined">
+      @if (post.headerImageUrl) {
+        <img mat-card-image [src]="post.headerImageUrl" [alt]="post.title" />
+      }
+
+      <mat-card-header>
+        <mat-card-title>{{ post.title }}</mat-card-title>
+        <mat-card-subtitle>von {{ post.author }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p>{{ post.contentPreview }}</p>
+        <p class="meta">{{ post.likes }} Likes · {{ post.comments }} Kommentare</p>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <p class="not-found">Blog-Post nicht gefunden.</p>
+  }
+</section>
