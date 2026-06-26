@@ -1,0 +1,41 @@
+@use '../../styles/variables' as v;
+@use '../../styles/mixins' as m;
+
+.blog-list {
+  max-width: v.$content-max-width;
+  margin: 0 auto;
+  padding: v.$spacing-xl v.$spacing-lg;
+
+  &__intro {
+    margin-bottom: v.$spacing-xl;
+
+    h1 {
+      margin: 0 0 v.$spacing-sm;
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      color: var(--mat-sys-on-background);
+    }
+
+    p {
+      margin: 0;
+      color: var(--mat-sys-on-surface-variant);
+      font-size: 1.05rem;
+    }
+  }
+
+  &__grid {
+    @include m.responsive-grid(300px, v.$spacing-lg);
+  }
+
+  &__loading {
+    @include m.flex-center;
+    padding-block: v.$spacing-2xl;
+  }
+
+  &__empty {
+    text-align: center;
+    color: var(--mat-sys-on-surface-variant);
+    padding-block: v.$spacing-xl;
+  }
+}

@@ -1,43 +1,6 @@
-.spacer {
-  flex: 1 1 auto;
-}
+@use './styles/variables' as v;
 
-.content {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-}
-
-.welcome-card {
-  h1 {
-    margin-top: 0;
-  }
-
-  code {
-    background: rgba(0, 0, 0, 0.06);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.9em;
-  }
-
-  pre {
-    background: rgba(0, 0, 0, 0.06);
-    padding: 1rem;
-    border-radius: 8px;
-    overflow-x: auto;
-
-    code {
-      background: none;
-      padding: 0;
-    }
-  }
-
-  ol,
-  ul {
-    line-height: 1.8;
-  }
-
-  a {
-    color: var(--mat-sys-primary);
-  }
+.app-content {
+  min-height: calc(100vh - #{v.$header-height});
+  background-color: var(--mat-sys-background);
 }

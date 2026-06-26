@@ -1,0 +1,38 @@
+@use 'variables' as v;
+
+// Centers any flex content both axes.
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Elevated surface that lifts on hover — used by BlogCard.
+@mixin card-hover-lift {
+  transition:
+    transform v.$transition-base,
+    box-shadow v.$transition-base;
+
+  &:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow:
+      0 12px 24px rgba(0, 0, 0, 0.12),
+      0 4px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+
+// Responsive auto-fit grid; pass min-column-width to control breakpoint behavior.
+@mixin responsive-grid($min: 280px, $gap: v.$spacing-lg) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($min, 1fr));
+  gap: $gap;
+}
+
+// Truncate text to N lines with ellipsis.
+@mixin clamp-lines($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

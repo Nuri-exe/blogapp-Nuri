@@ -1,0 +1,36 @@
+@use '@angular/material' as mat;
+
+// Shared config maps fed into both mat.theme() (for --mat-sys-* tokens)
+// and mat.define-theme() (for component-level themes).
+$light-config: (
+  color: (
+    theme-type: light,
+    primary: mat.$violet-palette,
+    tertiary: mat.$magenta-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto',
+    plain-family: 'Roboto',
+  ),
+  density: (
+    scale: 0,
+  ),
+);
+
+$dark-config: (
+  color: (
+    theme-type: dark,
+    primary: mat.$violet-palette,
+    tertiary: mat.$magenta-palette,
+  ),
+  typography: (
+    brand-family: 'Roboto',
+    plain-family: 'Roboto',
+  ),
+  density: (
+    scale: 0,
+  ),
+);
+
+$light-theme: mat.define-theme($light-config);
+$dark-theme: mat.define-theme($dark-config);

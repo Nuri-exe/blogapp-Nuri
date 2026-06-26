@@ -1,0 +1,74 @@
+@use '../../styles/variables' as v;
+@use '../../styles/mixins' as m;
+
+// Override toolbar's own background tokens so our gradient wins without !important.
+mat-toolbar.app-header {
+  --mat-toolbar-container-background-color: transparent;
+  --mat-toolbar-container-text-color: var(--mat-sys-on-primary);
+
+  display: flex;
+  align-items: center;
+  gap: v.$spacing-md;
+  padding-inline: v.$spacing-lg;
+  background: linear-gradient(135deg, var(--mat-sys-primary) 0%, var(--mat-sys-tertiary) 100%);
+  color: var(--mat-sys-on-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-header {
+  &__brand {
+    @include m.flex-center;
+    gap: v.$spacing-sm;
+    font-weight: 500;
+    font-size: 1.125rem;
+    color: inherit;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+
+    mat-icon {
+      font-size: 1.5rem;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  &__nav {
+    display: flex;
+    gap: v.$spacing-sm;
+    margin-inline-start: v.$spacing-lg;
+  }
+
+  &__link {
+    color: inherit;
+    text-decoration: none;
+    padding: v.$spacing-xs v.$spacing-md;
+    border-radius: v.$radius-sm;
+    font-weight: 500;
+    opacity: 0.85;
+    transition:
+      opacity v.$transition-fast,
+      background-color v.$transition-fast;
+
+    &:hover {
+      opacity: 1;
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    &.is-active {
+      opacity: 1;
+      background-color: rgba(255, 255, 255, 0.2);
+      box-shadow: inset 0 -2px 0 currentColor;
+    }
+  }
+
+  &__spacer {
+    flex: 1 1 auto;
+  }
+
+  &__theme-toggle {
+    color: inherit;
+  }
+}

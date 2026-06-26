@@ -1,0 +1,27 @@
+@use '../../styles/variables' as v;
+
+.about {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: v.$spacing-xl v.$spacing-lg;
+
+  &__card {
+    border-radius: v.$radius-lg;
+    background-color: var(--mat-sys-surface);
+    color: var(--mat-sys-on-surface);
+
+    p {
+      line-height: 1.65;
+      color: var(--mat-sys-on-surface-variant);
+    }
+
+    code {
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+      background-color: var(--mat-sys-surface-variant);
+      color: var(--mat-sys-on-surface-variant);
+      padding: 0.1em 0.4em;
+      border-radius: v.$radius-sm;
+      font-size: 0.9em;
+    }
+  }
+}
