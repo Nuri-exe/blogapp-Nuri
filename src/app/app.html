@@ -1,7 +1,12 @@
-<mat-toolbar color="primary">
-  <span>{{ title }}</span>
+<mat-toolbar color="primary" class="app-toolbar">
+  <a class="app-brand" routerLink="/">
+    <mat-icon class="app-brand__icon">auto_stories</mat-icon>
+    <span class="app-brand__title">{{ title }}</span>
+  </a>
+
   <span class="spacer"></span>
-  <nav>
+
+  <nav class="app-nav">
     <a
       mat-button
       routerLink="/"
@@ -12,6 +17,18 @@
     </a>
     <a mat-button routerLink="/about" routerLinkActive="active">Über</a>
   </nav>
+
+  <button
+    mat-icon-button
+    type="button"
+    class="theme-toggle"
+    (click)="toggleTheme()"
+    [matTooltip]="isDark() ? 'Light Mode aktivieren' : 'Dark Mode aktivieren'"
+    [attr.aria-label]="isDark() ? 'Zu Light Mode wechseln' : 'Zu Dark Mode wechseln'"
+    [attr.aria-pressed]="isDark()"
+  >
+    <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
 </mat-toolbar>
 
 <main class="content">

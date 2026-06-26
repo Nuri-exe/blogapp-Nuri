@@ -1,9 +1,19 @@
-.not-found-page {
-  padding: 3rem 1.5rem;
-  text-align: center;
-}
+@use '../../../styles/variables' as v;
+@use '../../../styles/mixins' as m;
 
-.not-found-page h1 {
-  font-size: 4rem;
-  margin: 0;
+.not-found-page {
+  @include m.flex-center(column, v.$spacing-md);
+  padding: v.$spacing-2xl v.$spacing-lg;
+  text-align: center;
+
+  h1 {
+    font-size: clamp(3rem, 8vw, 4rem);
+    margin: 0;
+    color: var(--mat-sys-primary);
+  }
+
+  p {
+    color: var(--mat-sys-on-surface-variant);
+    margin: 0 0 v.$spacing-md;
+  }
 }

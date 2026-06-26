@@ -1,43 +1,66 @@
+@use '../styles/variables' as v;
+@use '../styles/mixins' as m;
+
 .spacer {
   flex: 1 1 auto;
 }
 
-.content {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 0 1rem;
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  gap: v.$spacing-sm;
+  padding-inline: v.$spacing-md;
+  background-image: linear-gradient(
+    135deg,
+    var(--mat-sys-primary) 0%,
+    var(--mat-sys-tertiary) 100%
+  );
+  color: var(--mat-sys-on-primary);
+  box-shadow: var(--mat-sys-level2);
 }
 
-.welcome-card {
-  h1 {
-    margin-top: 0;
+.app-brand {
+  @include m.flex-center(row, v.$spacing-sm);
+  color: inherit;
+  text-decoration: none;
+  font-weight: 500;
+
+  &__icon {
+    font-size: 28px;
+    height: 28px;
+    width: 28px;
   }
 
-  code {
-    background: rgba(0, 0, 0, 0.06);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.9em;
-  }
+  &__title {
+    letter-spacing: 0.2px;
 
-  pre {
-    background: rgba(0, 0, 0, 0.06);
-    padding: 1rem;
-    border-radius: 8px;
-    overflow-x: auto;
-
-    code {
-      background: none;
-      padding: 0;
+    @media (max-width: 600px) {
+      font-size: 0.95rem;
     }
   }
+}
 
-  ol,
-  ul {
-    line-height: 1.8;
-  }
+.app-nav {
+  display: flex;
+  gap: v.$spacing-xs;
 
-  a {
-    color: var(--mat-sys-primary);
+  a[mat-button] {
+    border-radius: v.$radius-sm;
+    transition: background-color v.$transition-fast;
+
+    &.active {
+      background-color: color-mix(in srgb, var(--mat-sys-on-primary) 18%, transparent);
+      font-weight: 600;
+    }
   }
+}
+
+.theme-toggle {
+  color: inherit;
+}
+
+.content {
+  @include m.content-container();
+  padding-block: v.$spacing-lg;
 }
