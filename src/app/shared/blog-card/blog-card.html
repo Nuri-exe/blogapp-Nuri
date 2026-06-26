@@ -12,7 +12,9 @@
   }
 
   <mat-card-header class="blog-card__header">
-    <mat-card-title class="blog-card__title">{{ b.title }}</mat-card-title>
+    <mat-card-title class="blog-card__title">
+      <a [routerLink]="['/blogs', b.id]" class="blog-card__title-link">{{ b.title }}</a>
+    </mat-card-title>
     <mat-card-subtitle class="blog-card__subtitle">
       {{ b.author }} · {{ b.createdAt | date: 'd. MMM yyyy' }}
     </mat-card-subtitle>
@@ -23,14 +25,25 @@
   </mat-card-content>
 
   <mat-card-actions class="blog-card__actions">
-    <span class="blog-card__metric" [class.is-liked]="b.likedByMe">
-      <mat-icon aria-hidden="true">{{ b.likedByMe ? 'favorite' : 'favorite_border' }}</mat-icon>
-      <span>{{ b.likes }}</span>
-    </span>
+    <button
+      mat-icon-button
+      type="button"
+      class="blog-card__like-button"
+      [class.is-liked]="b.likedByMe"
+      [attr.aria-label]="b.likedByMe ? 'Like entfernen' : 'Beitrag liken'"
+      [attr.aria-pressed]="b.likedByMe"
+      [matTooltip]="b.likedByMe ? 'Like entfernen' : 'Beitrag liken'"
+      (click)="onLike()"
+    >
+      <mat-icon>{{ b.likedByMe ? 'favorite' : 'favorite_border' }}</mat-icon>
+    </button>
+    <span class="blog-card__metric" [class.is-liked]="b.likedByMe">{{ b.likes }}</span>
+
     <span class="blog-card__metric">
       <mat-icon aria-hidden="true">mode_comment</mat-icon>
       <span>{{ b.comments }}</span>
     </span>
+
     @if (b.createdByMe) {
       <mat-chip class="blog-card__chip" highlighted>Mein Beitrag</mat-chip>
     }

@@ -10,12 +10,12 @@
     <div class="blog-list__loading">
       <mat-spinner diameter="48" />
     </div>
-  } @else if (posts.length === 0) {
-    <p class="blog-list__empty">Noch keine Beiträge vorhanden.</p>
   } @else {
     <div class="blog-list__grid">
       @for (b of posts; track b.id) {
-        <app-blog-card [blog]="b" />
+        <app-blog-card [blog]="b" (like)="onLike($event)" />
+      } @empty {
+        <p class="blog-list__empty">Noch keine Beiträge vorhanden.</p>
       }
     </div>
   }

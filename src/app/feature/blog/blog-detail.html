@@ -1,0 +1,54 @@
+@let p = post();
+
+<section class="blog-detail">
+  <a routerLink="/blogs" class="blog-detail__back">
+    <mat-icon aria-hidden="true">arrow_back</mat-icon>
+    <span>Zurück zur Übersicht</span>
+  </a>
+
+  @if (p) {
+    <mat-card class="blog-detail__card" appearance="outlined">
+      @if (p.headerImageUrl) {
+        <img mat-card-image [src]="p.headerImageUrl" [alt]="p.title" class="blog-detail__image" />
+      }
+
+      <mat-card-header class="blog-detail__header">
+        <mat-card-title class="blog-detail__title">{{ p.title }}</mat-card-title>
+        <mat-card-subtitle class="blog-detail__subtitle">
+          {{ p.author }} · {{ p.createdAt | date: 'd. MMMM yyyy' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content class="blog-detail__content">
+        <p>{{ p.contentPreview }}</p>
+      </mat-card-content>
+
+      <mat-card-actions class="blog-detail__actions">
+        <button
+          mat-stroked-button
+          type="button"
+          class="blog-detail__like-button"
+          [class.is-liked]="p.likedByMe"
+          (click)="onLike()"
+        >
+          <mat-icon>{{ p.likedByMe ? 'favorite' : 'favorite_border' }}</mat-icon>
+          <span>{{ p.likes }} Likes</span>
+        </button>
+        <span class="blog-detail__metric">
+          <mat-icon aria-hidden="true">mode_comment</mat-icon>
+          <span>{{ p.comments }} Kommentare</span>
+        </span>
+        @if (p.createdByMe) {
+          <mat-chip highlighted>Mein Beitrag</mat-chip>
+        }
+      </mat-card-actions>
+    </mat-card>
+  } @else {
+    <mat-card class="blog-detail__missing" appearance="outlined">
+      <mat-card-content>
+        <h2>Beitrag nicht gefunden</h2>
+        <p>Der gesuchte Blog-Beitrag existiert nicht (mehr).</p>
+      </mat-card-content>
+    </mat-card>
+  }
+</section>

@@ -1,0 +1,101 @@
+@use '../../styles/variables' as v;
+@use '../../styles/mixins' as m;
+
+.blog-detail {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: v.$spacing-xl v.$spacing-lg;
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: v.$spacing-xs;
+    margin-bottom: v.$spacing-lg;
+    color: var(--mat-sys-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity v.$transition-fast;
+
+    &:hover {
+      opacity: 0.85;
+      text-decoration: underline;
+    }
+
+    mat-icon {
+      font-size: 1.125rem;
+      width: 1.125rem;
+      height: 1.125rem;
+    }
+  }
+
+  &__card {
+    border-radius: v.$radius-lg;
+    background-color: var(--mat-sys-surface);
+    color: var(--mat-sys-on-surface);
+    overflow: hidden;
+  }
+
+  &__image {
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  &__header {
+    padding-top: v.$spacing-md;
+  }
+
+  &__title {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: 500;
+    color: var(--mat-sys-on-surface);
+  }
+
+  &__subtitle {
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &__content {
+    padding-block: v.$spacing-md;
+    line-height: 1.7;
+    color: var(--mat-sys-on-surface-variant);
+    font-size: 1.05rem;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-md;
+    padding: v.$spacing-md;
+    border-top: 1px solid var(--mat-sys-outline-variant);
+    flex-wrap: wrap;
+  }
+
+  &__like-button {
+    &.is-liked {
+      color: var(--mat-sys-primary);
+    }
+  }
+
+  &__metric {
+    display: inline-flex;
+    align-items: center;
+    gap: v.$spacing-xs;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &__missing {
+    text-align: center;
+    padding: v.$spacing-xl;
+
+    h2 {
+      margin: 0 0 v.$spacing-sm;
+      color: var(--mat-sys-on-surface);
+    }
+
+    p {
+      margin: 0;
+      color: var(--mat-sys-on-surface-variant);
+    }
+  }
+}
