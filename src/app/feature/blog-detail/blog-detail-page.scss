@@ -1,20 +1,40 @@
-.blog-detail {
-  padding: 1.5rem;
-  max-width: 700px;
-  margin: 0 auto;
-}
+@use '../../../styles/variables' as v;
+@use '../../../styles/mixins' as m;
 
-.blog-detail a[mat-button] {
-  margin-bottom: 1rem;
+.blog-detail {
+  @include m.content-container(v.$content-narrow-width, 0);
+  padding-block: v.$spacing-lg;
+
+  a[mat-button] {
+    margin-bottom: v.$spacing-md;
+  }
+
+  mat-card {
+    border-radius: v.$radius-lg;
+    overflow: hidden;
+    box-shadow: var(--mat-sys-level1);
+  }
+
+  img[mat-card-image] {
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    margin: 0;
+  }
+
+  mat-card-content {
+    color: var(--mat-sys-on-surface);
+    line-height: 1.6;
+    padding-block: v.$spacing-md;
+  }
 }
 
 .meta {
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--mat-sys-on-surface-variant);
   font-size: 0.9rem;
-  margin-top: 1rem;
+  margin-top: v.$spacing-md;
 }
 
 .not-found {
   font-style: italic;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--mat-sys-on-surface-variant);
 }

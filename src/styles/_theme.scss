@@ -1,0 +1,67 @@
+@use '@angular/material' as mat;
+
+// Light theme: violet primary with magenta accents.
+$light-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: mat.$violet-palette,
+      tertiary: mat.$magenta-palette,
+    ),
+    typography: (
+      plain-family: (
+        Roboto,
+        'Helvetica Neue',
+        sans-serif,
+      ),
+      brand-family: (
+        Roboto,
+        'Helvetica Neue',
+        sans-serif,
+      ),
+    ),
+    density: (
+      scale: 0,
+    ),
+  )
+);
+
+// Dark theme — same palette, theme-type flipped so Material rolls
+// the dark tonal ramp.
+$dark-theme: mat.define-theme(
+  (
+    color: (
+      theme-type: dark,
+      primary: mat.$violet-palette,
+      tertiary: mat.$magenta-palette,
+    ),
+    typography: (
+      plain-family: (
+        Roboto,
+        'Helvetica Neue',
+        sans-serif,
+      ),
+      brand-family: (
+        Roboto,
+        'Helvetica Neue',
+        sans-serif,
+      ),
+    ),
+    density: (
+      scale: 0,
+    ),
+  )
+);
+
+// Apply the themes. We emit the full theme (tokens + colors + typography
+// + density) on :root for light, then override only the colors when the
+// .dark-theme class is present so we don't ship typography/density twice.
+@mixin apply-themes {
+  :root {
+    @include mat.all-component-themes($light-theme);
+  }
+
+  .dark-theme {
+    @include mat.all-component-colors($dark-theme);
+  }
+}

@@ -1,20 +1,9 @@
-@use '@angular/material' as mat;
+@use 'styles/variables' as v;
+@use 'styles/mixins' as m;
+@use 'styles/theme';
 
-// ── Light theme (azure primary) ──
-$light-theme: mat.define-theme(
-  (
-    color: (
-      theme-type: light,
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
-    ),
-  )
-);
-
-// ── Apply light theme as default on <html> ──
-html {
-  @include mat.all-component-themes($light-theme);
-}
+// Emit Material themes (light on :root, dark inside .dark-theme).
+@include theme.apply-themes;
 
 html,
 body {
@@ -24,4 +13,17 @@ body {
 body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background-color: var(--mat-sys-background);
+  color: var(--mat-sys-on-background);
+  transition:
+    background-color v.$transition-base,
+    color v.$transition-base;
+}
+
+// Global helper for links inside content surfaces — picks up the
+// themed primary color in both light and dark mode.
+a {
+  color: var(--mat-sys-primary);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
 }
