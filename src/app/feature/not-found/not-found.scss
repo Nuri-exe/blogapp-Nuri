@@ -1,0 +1,32 @@
+@use '../../styles/variables' as v;
+@use '../../styles/mixins' as m;
+
+.not-found {
+  @include m.flex-center;
+  flex-direction: column;
+  gap: v.$spacing-md;
+  padding: v.$spacing-2xl v.$spacing-lg;
+  text-align: center;
+  color: var(--mat-sys-on-background);
+
+  &__icon {
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &__code {
+    margin: 0;
+    font-size: clamp(3rem, 8vw, 4.5rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  &__text {
+    margin: 0 0 v.$spacing-md;
+    font-size: 1.1rem;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}

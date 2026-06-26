@@ -32,6 +32,18 @@
     color: var(--mat-sys-on-surface);
   }
 
+  &__title-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color v.$transition-fast;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--mat-sys-primary);
+      text-decoration: underline;
+    }
+  }
+
   &__subtitle {
     color: var(--mat-sys-on-surface-variant);
     font-size: 0.85rem;
@@ -70,6 +82,15 @@
       width: 1.125rem;
       height: 1.125rem;
     }
+
+    &.is-liked {
+      color: var(--mat-sys-primary);
+    }
+  }
+
+  &__like-button {
+    color: var(--mat-sys-on-surface-variant);
+    transition: color v.$transition-fast;
 
     &.is-liked {
       color: var(--mat-sys-primary);

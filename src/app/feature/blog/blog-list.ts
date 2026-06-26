@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { BlogCard } from '../../shared/blog-card/blog-card';
@@ -12,7 +11,11 @@ import { BlogService } from './blog-service';
   styleUrl: './blog-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class BlogList {
+export class BlogList {
   private readonly service = inject(BlogService);
-  protected readonly blogs = toSignal(this.service.getBlogs(), { initialValue: null });
+  protected readonly blogs = computed(() => this.service.getAll());
+
+  protected onLike(id: number): void {
+    this.service.toggleLike(id);
+  }
 }
