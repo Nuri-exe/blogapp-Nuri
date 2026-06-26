@@ -1,0 +1,38 @@
+@let b = blog();
+
+<mat-card class="blog-card" appearance="outlined">
+  @if (b.headerImageUrl) {
+    <img
+      mat-card-image
+      [src]="b.headerImageUrl"
+      [alt]="b.title"
+      class="blog-card__image"
+      loading="lazy"
+    />
+  }
+
+  <mat-card-header class="blog-card__header">
+    <mat-card-title class="blog-card__title">{{ b.title }}</mat-card-title>
+    <mat-card-subtitle class="blog-card__subtitle">
+      {{ b.author }} · {{ b.createdAt | date: 'd. MMM yyyy' }}
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content class="blog-card__content">
+    <p class="blog-card__preview">{{ b.contentPreview }}</p>
+  </mat-card-content>
+
+  <mat-card-actions class="blog-card__actions">
+    <span class="blog-card__metric" [class.is-liked]="b.likedByMe">
+      <mat-icon aria-hidden="true">{{ b.likedByMe ? 'favorite' : 'favorite_border' }}</mat-icon>
+      <span>{{ b.likes }}</span>
+    </span>
+    <span class="blog-card__metric">
+      <mat-icon aria-hidden="true">mode_comment</mat-icon>
+      <span>{{ b.comments }}</span>
+    </span>
+    @if (b.createdByMe) {
+      <mat-chip class="blog-card__chip" highlighted>Mein Beitrag</mat-chip>
+    }
+  </mat-card-actions>
+</mat-card>

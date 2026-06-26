@@ -1,0 +1,78 @@
+[
+  {
+    "id": 1,
+    "title": "Angular Signals — Ein Game Changer?",
+    "contentPreview": "Signals sind der neue reaktive Primitive in Angular. Sie ersetzen Zone.js und machen Change Detection effizienter. In diesem Post schauen wir uns an, wie Signals funktionieren und warum sie die Zukunft von Angular sind.",
+    "author": "Maria Keller",
+    "likes": 12,
+    "comments": 3,
+    "likedByMe": false,
+    "createdByMe": false,
+    "headerImageUrl": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&h=300&fit=crop",
+    "createdAt": "2026-02-15T10:30:00",
+    "updatedAt": "2026-02-16T08:15:00"
+  },
+  {
+    "id": 2,
+    "title": "Mein erstes Open-Source-Projekt",
+    "contentPreview": "Wie ich als Studentin mein erstes npm-Package veröffentlicht habe — von der Idee bis zur ersten GitHub-Star. Spoiler: Es war einfacher als gedacht, aber der Weg dahin war voller Überraschungen.",
+    "author": "Jonas Müller",
+    "likes": 8,
+    "comments": 5,
+    "likedByMe": true,
+    "createdByMe": false,
+    "headerImageUrl": "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?w=600&h=300&fit=crop",
+    "createdAt": "2026-02-10T14:00:00",
+    "updatedAt": "2026-02-12T09:30:00"
+  },
+  {
+    "id": 3,
+    "title": "TypeScript Generics in der Praxis",
+    "contentPreview": "Generics sind eines der mächtigsten Features von TypeScript — aber auch eines der verwirrendsten. Anhand von drei Praxisbeispielen zeige ich, wie du Generics sinnvoll einsetzen kannst.",
+    "author": "Sarah Brunner",
+    "likes": 15,
+    "comments": 7,
+    "likedByMe": false,
+    "createdByMe": false,
+    "createdAt": "2026-02-05T16:45:00",
+    "updatedAt": "2026-02-06T11:20:00"
+  },
+  {
+    "id": 4,
+    "title": "Dark Mode richtig implementieren",
+    "contentPreview": "Dark Mode ist mehr als nur Farben invertieren. CSS Custom Properties, prefers-color-scheme und Angular Material Theming — so baust du einen Dark Mode, der wirklich funktioniert.",
+    "author": "Maria Keller",
+    "likes": 20,
+    "comments": 4,
+    "likedByMe": true,
+    "createdByMe": false,
+    "headerImageUrl": "https://images.unsplash.com/photo-1515378960530-7c0da6231fb1?w=600&h=300&fit=crop",
+    "createdAt": "2026-01-28T09:00:00",
+    "updatedAt": "2026-01-30T14:10:00"
+  },
+  {
+    "id": 5,
+    "title": "REST API Design — Die häufigsten Fehler",
+    "contentPreview": "Warum heisst dein Endpoint /getUsers und nicht /users? Und warum gibt dein POST ein 200 statt ein 201 zurück? Die 5 häufigsten API-Design-Fehler und wie du sie vermeidest.",
+    "author": "Luca Bernasconi",
+    "likes": 25,
+    "comments": 12,
+    "likedByMe": false,
+    "createdByMe": false,
+    "createdAt": "2026-01-20T11:30:00",
+    "updatedAt": "2026-01-22T16:00:00"
+  },
+  {
+    "id": 6,
+    "title": "Git Branching-Strategien im Vergleich",
+    "contentPreview": "Git Flow, GitHub Flow oder Trunk-Based Development? Welche Branching-Strategie passt zu welchem Projekt? Ein Überblick mit Vor- und Nachteilen aus der Praxis.",
+    "author": "Jonas Müller",
+    "likes": 6,
+    "comments": 2,
+    "likedByMe": false,
+    "createdByMe": true,
+    "headerImageUrl": "https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=600&h=300&fit=crop",
+    "createdAt": "2026-01-15T13:00:00",
+    "updatedAt": "2026-01-15T13:00:00"
+  }
+]

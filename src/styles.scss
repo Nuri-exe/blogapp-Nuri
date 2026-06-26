@@ -1,19 +1,32 @@
 @use '@angular/material' as mat;
+@use './app/styles/theme' as theme;
+@use './app/styles/variables' as v;
 
-// ── Light theme (azure primary) ──
-$light-theme: mat.define-theme(
-  (
-    color: (
-      theme-type: light,
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
-    ),
-  )
-);
-
-// ── Apply light theme as default on <html> ──
+// Light theme — emits both --mat-sys-* tokens (for our own var() usage)
+// AND every component-level theme rule.
 html {
-  @include mat.all-component-themes($light-theme);
+  @include mat.theme(theme.$light-config);
+  @include mat.all-component-themes(theme.$light-theme);
+  color-scheme: light;
+}
+
+// Dark theme — opt-in via the .dark-theme class on <body>.
+// We re-emit the system tokens (so var(--mat-sys-primary) etc. flip)
+// and override only the color slice of the component themes.
+.dark-theme {
+  @include mat.theme(theme.$dark-config);
+  @include mat.all-component-colors(theme.$dark-theme);
+  color-scheme: dark;
+}
+
+// System preference fallback — users with OS dark mode get it automatically,
+// unless ThemeService has set data-theme-override on <html> to pin a choice.
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme-override]) body {
+    @include mat.theme(theme.$dark-config);
+    @include mat.all-component-colors(theme.$dark-theme);
+    color-scheme: dark;
+  }
 }
 
 html,
@@ -24,4 +37,9 @@ body {
 body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background-color: var(--mat-sys-background);
+  color: var(--mat-sys-on-background);
+  transition:
+    background-color v.$transition-base,
+    color v.$transition-base;
 }

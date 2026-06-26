@@ -1,0 +1,27 @@
+@let dark = theme.isDark();
+
+<mat-toolbar class="app-header">
+  <a routerLink="/" class="app-header__brand">
+    <mat-icon aria-hidden="true">article</mat-icon>
+    <span>{{ title }}</span>
+  </a>
+
+  <nav class="app-header__nav" aria-label="Hauptnavigation">
+    <a routerLink="/blogs" routerLinkActive="is-active" class="app-header__link">Beiträge</a>
+    <a routerLink="/about" routerLinkActive="is-active" class="app-header__link">Über</a>
+  </nav>
+
+  <span class="app-header__spacer"></span>
+
+  <button
+    mat-icon-button
+    type="button"
+    class="app-header__theme-toggle"
+    [attr.aria-label]="dark ? 'Light Mode aktivieren' : 'Dark Mode aktivieren'"
+    [attr.aria-pressed]="dark"
+    [matTooltip]="dark ? 'Light Mode' : 'Dark Mode'"
+    (click)="toggleTheme()"
+  >
+    <mat-icon>{{ dark ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+</mat-toolbar>
