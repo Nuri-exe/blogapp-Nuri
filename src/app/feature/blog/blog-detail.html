@@ -34,12 +34,39 @@
           <mat-icon>{{ p.likedByMe ? 'favorite' : 'favorite_border' }}</mat-icon>
           <span>{{ p.likes }} Likes</span>
         </button>
+
         <span class="blog-detail__metric">
           <mat-icon aria-hidden="true">mode_comment</mat-icon>
           <span>{{ p.comments }} Kommentare</span>
         </span>
+
         @if (p.createdByMe) {
           <mat-chip highlighted>Mein Beitrag</mat-chip>
+        }
+
+        <span class="blog-detail__spacer"></span>
+
+        <a mat-stroked-button [routerLink]="['/blogs', p.id, 'edit']">
+          <mat-icon>edit</mat-icon>
+          <span>Bearbeiten</span>
+        </a>
+
+        @if (confirmingDelete()) {
+          <button
+            mat-flat-button
+            type="button"
+            class="blog-detail__delete-confirm"
+            [disabled]="deleting()"
+            (click)="onDelete()"
+          >
+            {{ deleting() ? 'Wird gelöscht …' : 'Wirklich löschen' }}
+          </button>
+          <button mat-button type="button" (click)="confirmingDelete.set(false)">Abbrechen</button>
+        } @else {
+          <button mat-stroked-button type="button" (click)="confirmingDelete.set(true)">
+            <mat-icon>delete</mat-icon>
+            <span>Löschen</span>
+          </button>
         }
       </mat-card-actions>
     </mat-card>

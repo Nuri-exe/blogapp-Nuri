@@ -7,6 +7,11 @@
   padding: v.$spacing-xl v.$spacing-lg;
 
   &__intro {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: v.$spacing-lg;
+    flex-wrap: wrap;
     margin-bottom: v.$spacing-xl;
 
     h1 {
@@ -24,13 +29,46 @@
     }
   }
 
+  &__notice,
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-sm;
+    margin: 0 0 v.$spacing-lg;
+    padding: v.$spacing-sm v.$spacing-md;
+    border-radius: v.$radius-md;
+    font-size: 0.95rem;
+  }
+
+  &__notice {
+    background-color: var(--mat-sys-surface-container-high);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  &__error {
+    background-color: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+    flex-wrap: wrap;
+
+    button {
+      margin-inline-start: auto;
+    }
+  }
+
   &__grid {
     @include m.responsive-grid(300px, v.$spacing-lg);
   }
 
   &__loading {
     @include m.flex-center;
+    flex-direction: column;
+    gap: v.$spacing-md;
     padding-block: v.$spacing-2xl;
+    color: var(--mat-sys-on-surface-variant);
+
+    p {
+      margin: 0;
+    }
   }
 
   &__empty {

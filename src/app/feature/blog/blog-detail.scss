@@ -84,6 +84,16 @@
     color: var(--mat-sys-on-surface-variant);
   }
 
+  // Pushes the edit/delete controls to the trailing edge of the action row.
+  &__spacer {
+    flex: 1 1 auto;
+  }
+
+  &__delete-confirm {
+    --mdc-filled-button-container-color: var(--mat-sys-error);
+    --mdc-filled-button-label-text-color: var(--mat-sys-on-error);
+  }
+
   &__missing {
     text-align: center;
     padding: v.$spacing-xl;

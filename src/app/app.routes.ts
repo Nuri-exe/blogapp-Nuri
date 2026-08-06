@@ -10,11 +10,22 @@ export const routes: Routes = [
     component: BlogList,
     title: 'Beiträge — HFTM Blog',
   },
+  // Must stay above 'blogs/:id', otherwise 'new' would be read as an id.
+  {
+    path: 'blogs/new',
+    loadComponent: () => import('./feature/blog/blog-form').then((m) => m.BlogForm),
+    title: 'Neuer Beitrag — HFTM Blog',
+  },
   {
     path: 'blogs/:id',
     loadComponent: () => import('./feature/blog/blog-detail').then((m) => m.BlogDetail),
     resolve: { blog: blogResolver },
     title: 'Beitrag — HFTM Blog',
+  },
+  {
+    path: 'blogs/:id/edit',
+    loadComponent: () => import('./feature/blog/blog-form').then((m) => m.BlogForm),
+    title: 'Beitrag bearbeiten — HFTM Blog',
   },
   {
     path: 'about',

@@ -1,0 +1,78 @@
+@use '../../styles/variables' as v;
+@use '../../styles/mixins' as m;
+
+.blog-form {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: v.$spacing-xl v.$spacing-lg;
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: v.$spacing-xs;
+    margin-bottom: v.$spacing-lg;
+    color: var(--mat-sys-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity v.$transition-fast;
+
+    &:hover {
+      opacity: 0.85;
+      text-decoration: underline;
+    }
+
+    mat-icon {
+      font-size: 1.125rem;
+      width: 1.125rem;
+      height: 1.125rem;
+    }
+  }
+
+  &__card {
+    border-radius: v.$radius-lg;
+    background-color: var(--mat-sys-surface);
+    color: var(--mat-sys-on-surface);
+  }
+
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    gap: v.$spacing-sm;
+    padding-top: v.$spacing-md;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-md;
+    margin-top: v.$spacing-sm;
+    flex-wrap: wrap;
+
+    button mat-spinner {
+      margin-inline-end: v.$spacing-sm;
+    }
+  }
+
+  &__loading {
+    @include m.flex-center;
+    flex-direction: column;
+    gap: v.$spacing-md;
+    padding-block: v.$spacing-xl;
+    color: var(--mat-sys-on-surface-variant);
+
+    p {
+      margin: 0;
+    }
+  }
+
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-sm;
+    margin: v.$spacing-md 0 0;
+    padding: v.$spacing-sm v.$spacing-md;
+    border-radius: v.$radius-md;
+    background-color: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  }
+}
