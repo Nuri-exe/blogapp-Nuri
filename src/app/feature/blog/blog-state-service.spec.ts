@@ -143,6 +143,55 @@ describe('BlogStateService', () => {
       expect(service.offline()).toBe(false);
     });
 
+    it('discards a load once a newer load has already committed', async () => {
+      let resolveSlow!: (blogs: Blog[]) => void;
+      backend.getBlogs
+        .mockReturnValueOnce(
+          new Promise<Blog[]>((resolve) => {
+            resolveSlow = resolve;
+          }),
+        )
+        .mockResolvedValueOnce([blog({ id: 2, title: 'Frisch' })]);
+
+      const service = createService();
+      const slow = service.loadBlogs();
+      await service.loadBlogs();
+      expect(service.getById(2)?.title).toBe('Frisch');
+
+      // The first request finally answers — it must not win any more.
+      resolveSlow([blog({ id: 1, title: 'Veraltet' })]);
+      await slow;
+
+      expect(service.getById(2)).toBeDefined();
+      expect(service.getById(1)).toBeUndefined();
+    });
+
+    it('does not let a late fallback overwrite an entry created meanwhile', async () => {
+      let rejectSlow!: (reason: unknown) => void;
+      backend.getBlogs.mockReturnValue(
+        new Promise<Blog[]>((_resolve, reject) => {
+          rejectSlow = reject;
+        }),
+      );
+      backend.getFallbackBlogs.mockResolvedValue([blog({ id: 99, title: 'Beispieldaten' })]);
+
+      const service = createService();
+      const slow = service.loadBlogs();
+
+      backend.createBlog.mockResolvedValue(blog({ id: 5, title: 'Neu' }));
+      await service.createBlog({ title: 'Neu', contentPreview: 'Text …', author: 'Nuri' });
+      expect(service.getById(5)).toBeDefined();
+
+      // The stalled request times out after the write already landed.
+      rejectSlow(new Error('timeout'));
+      await slow;
+
+      expect(service.getById(5)).toBeDefined();
+      expect(service.getById(99)).toBeUndefined();
+      expect(backend.getFallbackBlogs).not.toHaveBeenCalled();
+      expect(service.offline()).toBe(false);
+    });
+
     it('keeps already loaded entries when a later reload fails', async () => {
       backend.getBlogs.mockResolvedValue([blog({ id: 7 })]);
       const service = createService();
@@ -155,6 +204,21 @@ describe('BlogStateService', () => {
 
       expect(service.error()).not.toBeNull();
       expect(service.blogCount()).toBe(1);
+    });
+  });
+
+  describe('clearError', () => {
+    it('empties the shared error slot so it cannot follow the user to another page', async () => {
+      backend.getBlogs.mockRejectedValue(new Error('down'));
+      backend.getFallbackBlogs.mockRejectedValue(new Error('missing'));
+
+      const service = createService();
+      await service.loadBlogs();
+      expect(service.error()).not.toBeNull();
+
+      service.clearError();
+
+      expect(service.error()).toBeNull();
     });
   });
 

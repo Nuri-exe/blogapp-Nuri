@@ -23,7 +23,13 @@ export class BlogDetail {
 
   /** Reads straight from the store, so edits elsewhere show up here too. */
   protected readonly post = computed(() => this.state.getById(Number(this.id())));
-  protected readonly error = this.state.error;
+
+  /**
+   * Owned by this page rather than read from the store: `BlogState.error` is a
+   * single shared slot, so rendering it here would also show a message another
+   * page produced.
+   */
+  protected readonly error = signal<string | null>(null);
 
   protected readonly confirmingDelete = signal(false);
   protected readonly deleting = signal(false);
@@ -38,9 +44,17 @@ export class BlogDetail {
     if (!post) return;
 
     this.deleting.set(true);
+    this.error.set(null);
+
     try {
-      const removed = await this.state.deleteBlog(post.id);
-      if (removed) await this.router.navigate(['/blogs']);
+      if (await this.state.deleteBlog(post.id)) {
+        await this.router.navigate(['/blogs']);
+        return;
+      }
+
+      // Take the message out of the shared slot so it cannot follow the user.
+      this.error.set(this.state.error() ?? 'Der Beitrag konnte nicht gelöscht werden.');
+      this.state.clearError();
     } finally {
       this.deleting.set(false);
       this.confirmingDelete.set(false);

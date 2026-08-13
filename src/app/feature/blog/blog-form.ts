@@ -52,9 +52,13 @@ export class BlogForm {
 
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
-  /** Local problems (entry missing); backend problems come from the store. */
-  protected readonly localError = signal<string | null>(null);
-  protected readonly error = computed(() => this.localError() ?? this.state.error());
+
+  /**
+   * Owned by this page rather than read from the store: `BlogState.error` is a
+   * single shared slot, so rendering it here would also show a message another
+   * page produced.
+   */
+  protected readonly error = signal<string | null>(null);
 
   protected readonly form = this.fb.nonNullable.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
@@ -90,7 +94,7 @@ export class BlogForm {
     };
 
     this.saving.set(true);
-    this.localError.set(null);
+    this.error.set(null);
 
     try {
       const id = this.blogId();
@@ -99,8 +103,14 @@ export class BlogForm {
           ? await this.state.createBlog(payload)
           : await this.state.updateBlog(id, payload);
 
-      // A null result means the store already holds the error message.
-      if (saved) await this.router.navigate(['/blogs', saved.id]);
+      if (saved) {
+        await this.router.navigate(['/blogs', saved.id]);
+        return;
+      }
+
+      // Take the message out of the shared slot so it cannot follow the user.
+      this.error.set(this.state.error() ?? 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
+      this.state.clearError();
     } finally {
       this.saving.set(false);
     }
@@ -108,7 +118,7 @@ export class BlogForm {
 
   private async loadExisting(id: number): Promise<void> {
     this.loading.set(true);
-    this.localError.set(null);
+    this.error.set(null);
 
     try {
       if (this.state.blogs().length === 0) {
@@ -117,7 +127,7 @@ export class BlogForm {
 
       const blog = this.state.getById(id);
       if (!blog) {
-        this.localError.set('Dieser Beitrag konnte nicht geladen werden.');
+        this.error.set('Dieser Beitrag konnte nicht geladen werden.');
         return;
       }
 

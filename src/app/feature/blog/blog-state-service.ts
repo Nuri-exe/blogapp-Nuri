@@ -53,6 +53,17 @@ export class BlogStateService {
     offline: false,
   });
 
+  /**
+   * Counts committed changes. A load captures it before awaiting and drops its
+   * own result if anything landed meanwhile.
+   *
+   * Without this, a request that times out after 8s would still run its
+   * reducer: it lands in the catch branch, loads the bundled sample file and
+   * replaces the list — throwing away the newer entries a second load already
+   * delivered, or an entry the user just created.
+   */
+  #epoch = 0;
+
   // ----------------------------------------------------------- derived state
 
   readonly blogs = computed(() => this.#state().blogs);
@@ -93,16 +104,23 @@ export class BlogStateService {
 
   /** Loads the list, falling back to the bundled sample data if the API is down. */
   async loadBlogs(): Promise<void> {
+    const epoch = ++this.#epoch;
     this.#loadStarted();
 
     try {
-      this.#loadSucceeded(await this.backend.getBlogs());
+      const blogs = await this.backend.getBlogs();
+      if (this.#superseded(epoch)) return;
+      this.#loadSucceeded(blogs);
     } catch (error) {
+      if (this.#superseded(epoch)) return;
       console.error('[BlogStateService] Loading from the backend failed.', error);
 
       try {
-        this.#fallbackLoaded(await this.backend.getFallbackBlogs());
+        const blogs = await this.backend.getFallbackBlogs();
+        if (this.#superseded(epoch)) return;
+        this.#fallbackLoaded(blogs);
       } catch (fallbackError) {
+        if (this.#superseded(epoch)) return;
         console.error('[BlogStateService] The local fallback failed too.', fallbackError);
         this.#loadFailed('Beiträge konnten nicht geladen werden.');
       }
@@ -114,8 +132,14 @@ export class BlogStateService {
     this.#authorSelected(author);
   }
 
+  /** Drops the current error message — used when a page stops owning it. */
+  clearError(): void {
+    this.#errorCleared();
+  }
+
   /** Creates an entry and puts it at the top of the list. */
   async createBlog(input: BlogInput): Promise<Blog | null> {
+    this.#epoch += 1;
     this.#saveStarted();
 
     try {
@@ -131,6 +155,7 @@ export class BlogStateService {
 
   /** Updates an entry in place. */
   async updateBlog(id: number, input: BlogInput): Promise<Blog | null> {
+    this.#epoch += 1;
     this.#saveStarted();
 
     try {
@@ -146,6 +171,7 @@ export class BlogStateService {
 
   /** Removes an entry. */
   async deleteBlog(id: number): Promise<boolean> {
+    this.#epoch += 1;
     this.#saveStarted();
 
     try {
@@ -161,12 +187,18 @@ export class BlogStateService {
 
   /** Optimistic, client-side like toggle. */
   toggleLike(id: number): void {
+    this.#epoch += 1;
     this.#likeToggled(id);
   }
 
   /** Cache lookup used by the detail page and the detail route resolver. */
   getById(id: number): Blog | undefined {
     return this.blogs().find((blog) => blog.id === id);
+  }
+
+  /** True once a newer load or any write has committed since `epoch` was taken. */
+  #superseded(epoch: number): boolean {
+    return epoch !== this.#epoch;
   }
 
   // ---------------------------------------------------------------- reducers
@@ -251,5 +283,10 @@ export class BlogStateService {
   /** The author filter changed. */
   #authorSelected(author: string): void {
     this.#state.update((state) => ({ ...state, selectedAuthor: author }));
+  }
+
+  /** The error was acknowledged. */
+  #errorCleared(): void {
+    this.#state.update((state) => ({ ...state, error: null }));
   }
 }
