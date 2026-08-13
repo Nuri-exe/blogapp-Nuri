@@ -1,46 +1,56 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 
 import { BlogCard } from '../../shared/blog-card/blog-card';
-import { BlogService } from './blog-service';
+import { ALL_AUTHORS, BlogStateService } from './blog-state-service';
 
 @Component({
   selector: 'app-blog-list',
-  imports: [BlogCard, RouterLink, MatButtonModule, MatIconModule, MatProgressSpinnerModule],
+  imports: [
+    BlogCard,
+    RouterLink,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatSelectModule,
+  ],
   templateUrl: './blog-list.html',
   styleUrl: './blog-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class BlogList {
-  private readonly service = inject(BlogService);
+export class BlogList implements OnInit {
+  private readonly state = inject(BlogStateService);
 
-  protected readonly blogs = this.service.blogs;
-  protected readonly offline = this.service.offline;
-  protected readonly loading = signal(false);
-  protected readonly error = signal<string | null>(null);
+  // Read-only views onto the central state — the component cannot write to it.
+  protected readonly blogs = this.state.filteredBlogs;
+  protected readonly loading = this.state.loading;
+  protected readonly error = this.state.error;
+  protected readonly offline = this.state.offline;
+  protected readonly blogCount = this.state.blogCount;
+  protected readonly authors = this.state.authors;
+  protected readonly selectedAuthor = this.state.selectedAuthor;
 
-  constructor() {
-    void this.reload();
+  protected readonly allAuthors = ALL_AUTHORS;
+
+  ngOnInit(): void {
+    void this.state.loadBlogs();
   }
 
-  protected async reload(): Promise<void> {
-    this.loading.set(true);
-    this.error.set(null);
+  protected reload(): void {
+    void this.state.loadBlogs();
+  }
 
-    try {
-      await this.service.getBlogs();
-    } catch (error) {
-      console.error('[BlogList] Could not load blog entries.', error);
-      this.error.set('Beiträge konnten nicht geladen werden.');
-    } finally {
-      this.loading.set(false);
-    }
+  protected onAuthorChange(author: string): void {
+    this.state.setAuthor(author);
   }
 
   protected onLike(id: number): void {
-    this.service.toggleLike(id);
+    this.state.toggleLike(id);
   }
 }

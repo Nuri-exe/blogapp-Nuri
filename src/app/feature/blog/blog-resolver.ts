@@ -2,19 +2,23 @@ import { inject } from '@angular/core';
 import { ResolveFn } from '@angular/router';
 
 import { Blog } from './blog-model';
-import { BlogService } from './blog-service';
+import { BlogStateService } from './blog-state-service';
 
 /**
- * Makes sure the entries are in the cache before the detail page renders, so
- * the page never shows a loading state of its own.
+ * Makes sure the entries are in the store before the detail page renders, so
+ * that page never shows a loading state of its own.
+ *
+ * Note: only the detail route uses this. The overview loads through
+ * `loadBlogs()` in `ngOnInit` on purpose — a resolver there would block
+ * navigation and the loading/error states would never be visible.
  */
 export const blogResolver: ResolveFn<Blog | undefined> = async (route) => {
-  const service = inject(BlogService);
+  const state = inject(BlogStateService);
 
-  if (service.blogs().length === 0) {
-    await service.getBlogs();
+  if (state.blogs().length === 0) {
+    await state.loadBlogs();
   }
 
   const idParam = route.paramMap.get('id');
-  return idParam ? service.getById(Number(idParam)) : undefined;
+  return idParam ? state.getById(Number(idParam)) : undefined;
 };

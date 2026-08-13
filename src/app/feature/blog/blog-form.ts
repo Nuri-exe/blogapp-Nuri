@@ -18,7 +18,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { BlogInput } from './blog-model';
-import { BlogService } from './blog-service';
+import { BlogStateService } from './blog-state-service';
 
 @Component({
   selector: 'app-blog-form',
@@ -37,7 +37,7 @@ import { BlogService } from './blog-service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlogForm {
-  private readonly service = inject(BlogService);
+  private readonly state = inject(BlogStateService);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
 
@@ -52,7 +52,9 @@ export class BlogForm {
 
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
-  protected readonly error = signal<string | null>(null);
+  /** Local problems (entry missing); backend problems come from the store. */
+  protected readonly localError = signal<string | null>(null);
+  protected readonly error = computed(() => this.localError() ?? this.state.error());
 
   protected readonly form = this.fb.nonNullable.group({
     title: ['', [Validators.required, Validators.minLength(3)]],
@@ -64,7 +66,7 @@ export class BlogForm {
   constructor() {
     // Route inputs arrive after construction, so react to the id instead of
     // reading it once. untracked() keeps the async load out of the dependency
-    // graph — otherwise reading the service signals would re-trigger the effect.
+    // graph — otherwise reading the store signals would re-trigger the effect.
     effect(() => {
       const id = this.blogId();
       untracked(() => {
@@ -88,24 +90,17 @@ export class BlogForm {
     };
 
     this.saving.set(true);
-    this.error.set(null);
+    this.localError.set(null);
 
     try {
       const id = this.blogId();
       const saved =
         id === null
-          ? await this.service.createBlog(payload)
-          : await this.service.updateBlog(id, payload);
+          ? await this.state.createBlog(payload)
+          : await this.state.updateBlog(id, payload);
 
-      if (!saved) {
-        this.error.set('Speichern fehlgeschlagen. Bitte versuche es erneut.');
-        return;
-      }
-
-      await this.router.navigate(['/blogs', saved.id]);
-    } catch (error) {
-      console.error('[BlogForm] Saving the entry failed.', error);
-      this.error.set('Speichern fehlgeschlagen. Bitte versuche es erneut.');
+      // A null result means the store already holds the error message.
+      if (saved) await this.router.navigate(['/blogs', saved.id]);
     } finally {
       this.saving.set(false);
     }
@@ -113,12 +108,16 @@ export class BlogForm {
 
   private async loadExisting(id: number): Promise<void> {
     this.loading.set(true);
-    this.error.set(null);
+    this.localError.set(null);
 
     try {
-      const blog = await this.service.getBlog(id);
+      if (this.state.blogs().length === 0) {
+        await this.state.loadBlogs();
+      }
+
+      const blog = this.state.getById(id);
       if (!blog) {
-        this.error.set('Dieser Beitrag konnte nicht geladen werden.');
+        this.localError.set('Dieser Beitrag konnte nicht geladen werden.');
         return;
       }
 
@@ -128,9 +127,6 @@ export class BlogForm {
         contentPreview: blog.contentPreview,
         headerImageUrl: blog.headerImageUrl ?? '',
       });
-    } catch (error) {
-      console.error('[BlogForm] Loading the entry failed.', error);
-      this.error.set('Dieser Beitrag konnte nicht geladen werden.');
     } finally {
       this.loading.set(false);
     }

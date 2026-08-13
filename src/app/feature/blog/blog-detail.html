@@ -6,6 +6,13 @@
     <span>Zurück zur Übersicht</span>
   </a>
 
+  @if (error(); as message) {
+    <p class="blog-detail__error" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <span>{{ message }}</span>
+    </p>
+  }
+
   @if (p) {
     <mat-card class="blog-detail__card" appearance="outlined">
       @if (p.headerImageUrl) {
