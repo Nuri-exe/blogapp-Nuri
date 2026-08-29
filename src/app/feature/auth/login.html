@@ -1,0 +1,35 @@
+<section class="login">
+  <mat-card class="login__card" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Anmelden</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content class="login__content">
+      @if (errorMessage(); as message) {
+        <p class="login__error" role="alert" data-testid="login-error">
+          <mat-icon aria-hidden="true">error_outline</mat-icon>
+          <span>{{ message }}</span>
+        </p>
+      }
+
+      @if (authEnabled) {
+        <p>
+          Du wirst zur Anmeldeseite von Keycloak weitergeleitet. Dein Passwort gibst du dort ein —
+          diese App sieht es nie.
+        </p>
+
+        <button mat-flat-button type="button" data-testid="login-submit" (click)="signIn()">
+          <mat-icon>login</mat-icon>
+          <span>Mit Keycloak anmelden</span>
+        </button>
+      } @else {
+        <p class="login__disabled" role="status">
+          Für diesen Build ist keine Anmeldung eingerichtet: Das BFF läuft nur lokal, das gehostete
+          Frontend kann es nicht bereitstellen.
+        </p>
+      }
+
+      <a mat-stroked-button routerLink="/blogs">Zurück zur Übersicht</a>
+    </mat-card-content>
+  </mat-card>
+</section>
