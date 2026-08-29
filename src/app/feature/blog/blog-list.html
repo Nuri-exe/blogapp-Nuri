@@ -5,7 +5,7 @@
       <p>Geschichten, Tutorials und Erfahrungen aus der Web-Development-Welt.</p>
     </div>
 
-    @if (canWrite()) {
+    @if (auth.canWrite()) {
       <a mat-flat-button routerLink="/blogs/new" class="blog-list__new">
         <mat-icon>add</mat-icon>
         <span>Neuer Beitrag</span>

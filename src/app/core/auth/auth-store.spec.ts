@@ -76,7 +76,6 @@ describe('AuthStore', () => {
       expect(store.isAuthenticated()).toBe(true);
       expect(store.user()).toEqual(user);
       expect(store.roles()).toEqual(['user']);
-      expect(store.hasRole('user')).toBe(true);
       expect(store.canWrite()).toBe(true);
       expect(store.loading()).toBe(false);
     });

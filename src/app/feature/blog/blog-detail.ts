@@ -21,7 +21,7 @@ export class BlogDetail {
   private readonly router = inject(Router);
 
   /** Hides the edit/delete actions for visitors who could not use them anyway. */
-  protected readonly canWrite = inject(AuthStore).canWrite;
+  protected readonly auth = inject(AuthStore);
 
   readonly id = input.required<string>();
 

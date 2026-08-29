@@ -119,9 +119,4 @@ export class AuthStore {
       window.location.href = '/';
     }
   }
-
-  /** Convenience read for templates and guards. */
-  hasRole(role: string): boolean {
-    return this.roles().includes(role);
-  }
 }

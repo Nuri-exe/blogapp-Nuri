@@ -30,7 +30,7 @@ export function roleGuard(role: string): CanMatchFn {
     // ends in a full page reload, so this runs on every protected navigation.
     await authStore.ready;
 
-    if (authStore.isAuthenticated() && authStore.hasRole(role)) {
+    if (authStore.isAuthenticated() && authStore.roles().includes(role)) {
       return true;
     }
 

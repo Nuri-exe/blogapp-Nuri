@@ -8,8 +8,8 @@ export const ALL_AUTHORS = 'all';
 
 const STORAGE_KEY = 'blogapp.selectedAuthor';
 
-/** Everything the blog feature knows, in one object. */
-export interface BlogState {
+/** Everything the blog feature knows, in one object. Internal to this store. */
+interface BlogState {
   blogs: Blog[];
   loading: boolean;
   error: string | null;

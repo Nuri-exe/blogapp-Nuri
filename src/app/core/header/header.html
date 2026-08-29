@@ -13,7 +13,9 @@
 
   <span class="app-header__spacer"></span>
 
-  @if (authEnabled) {
+  <!-- Waiting for the session check keeps a signed-in user from seeing "Login"
+       flash before their name resolves. -->
+  @if (authEnabled && !auth.loading()) {
     @if (auth.isAuthenticated()) {
       <span class="app-header__user" data-testid="current-user">
         <mat-icon aria-hidden="true">account_circle</mat-icon>

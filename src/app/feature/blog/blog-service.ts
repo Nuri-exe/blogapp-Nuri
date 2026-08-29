@@ -37,14 +37,6 @@ export class BlogService {
     return this.parseList(payload);
   }
 
-  /** GET /entries/:id */
-  async getBlog(id: number): Promise<Blog> {
-    const payload = await firstValueFrom(
-      this.http.get<unknown>(`${this.apiUrl}/${id}`).pipe(timeout(environment.apiTimeoutMs)),
-    );
-    return this.parseEntry(`GET ${this.apiUrl}/${id}`, payload);
-  }
-
   /** POST /entries */
   async createBlog(blog: BlogInput): Promise<Blog> {
     const payload = await firstValueFrom(

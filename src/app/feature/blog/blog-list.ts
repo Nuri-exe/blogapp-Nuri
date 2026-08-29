@@ -29,7 +29,7 @@ export class BlogList implements OnInit {
   private readonly state = inject(BlogStateService);
 
   /** Hides the create action for visitors who could not use it anyway. */
-  protected readonly canWrite = inject(AuthStore).canWrite;
+  protected readonly auth = inject(AuthStore);
 
   // Read-only views onto the central state — the component cannot write to it.
   protected readonly blogs = this.state.filteredBlogs;

@@ -53,7 +53,7 @@
 
         <span class="blog-detail__spacer"></span>
 
-        @if (canWrite()) {
+        @if (auth.canWrite()) {
           <a mat-stroked-button [routerLink]="['/blogs', p.id, 'edit']">
             <mat-icon>edit</mat-icon>
             <span>Bearbeiten</span>

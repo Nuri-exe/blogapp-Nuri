@@ -10,7 +10,7 @@ import { AuthStore } from './auth-store';
 interface AuthStub {
   ready: Promise<void>;
   isAuthenticated: () => boolean;
-  hasRole: (role: string) => boolean;
+  roles: () => string[];
 }
 
 describe('authGuard', () => {
@@ -30,7 +30,7 @@ describe('authGuard', () => {
     const stub: AuthStub = {
       ready: Promise.resolve(),
       isAuthenticated: () => true,
-      hasRole: () => true,
+      roles: () => ['user'],
       ...auth,
     };
 
@@ -60,7 +60,7 @@ describe('authGuard', () => {
   });
 
   it('redirects a signed-in user who lacks the role', async () => {
-    const result = await run({ hasRole: () => false });
+    const result = await run({ roles: () => ['reader'] });
 
     expect(result).toBeInstanceOf(UrlTree);
     expect(TestBed.inject(Router).serializeUrl(result as UrlTree)).toContain('/login');
