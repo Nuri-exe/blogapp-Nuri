@@ -9,9 +9,6 @@ import { BlogService } from './blog-service';
 const API = `${environment.apiBaseUrl}/entries`;
 const FALLBACK = '/data/blogs.json';
 
-/** Lets pending microtasks (and the lazy `blog-schema` import) settle. */
-const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
-
 function entry(overrides: Record<string, unknown> = {}) {
   return {
     id: 1,
@@ -29,12 +26,12 @@ function entry(overrides: Record<string, unknown> = {}) {
   };
 }
 
-describe('BlogService', () => {
+describe('BlogService (backend gateway)', () => {
   let service: BlogService;
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
-    // The service logs every rejected payload on purpose; keep the test output clean.
+    // The service logs every rejected payload on purpose; keep the output clean.
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
@@ -51,13 +48,6 @@ describe('BlogService', () => {
     vi.restoreAllMocks();
   });
 
-  /** Seeds the cache through the regular GET path. */
-  async function seed(entries: Record<string, unknown>[] = [entry()]) {
-    const promise = service.getBlogs();
-    httpMock.expectOne(API).flush({ data: entries });
-    await promise;
-  }
-
   describe('getBlogs', () => {
     it('unwraps the paginated envelope', async () => {
       const promise = service.getBlogs();
@@ -69,8 +59,6 @@ describe('BlogService', () => {
       const blogs = await promise;
       expect(blogs).toHaveLength(1);
       expect(blogs[0].title).toBe('Erster Beitrag');
-      expect(service.blogs()).toEqual(blogs);
-      expect(service.offline()).toBe(false);
     });
 
     it('also accepts a bare array', async () => {
@@ -116,32 +104,29 @@ describe('BlogService', () => {
       expect(await promise).toEqual([]);
     });
 
-    it('falls back to the local sample data when the backend fails', async () => {
+    it('rejects when the backend fails, instead of swallowing the error', async () => {
       const promise = service.getBlogs();
       httpMock.expectOne(API).flush('boom', { status: 500, statusText: 'Server Error' });
 
-      await tick();
-      httpMock.expectOne(FALLBACK).flush([entry({ id: 42 })]);
-
-      const blogs = await promise;
-      expect(blogs[0].id).toBe(42);
-      expect(service.offline()).toBe(true);
-    });
-
-    it('degrades to an empty list when even the fallback fails', async () => {
-      const promise = service.getBlogs();
-      httpMock.expectOne(API).flush('boom', { status: 500, statusText: 'Server Error' });
-
-      await tick();
-      httpMock.expectOne(FALLBACK).flush('gone', { status: 404, statusText: 'Not Found' });
-
-      expect(await promise).toEqual([]);
-      expect(service.blogs()).toEqual([]);
+      await expect(promise).rejects.toBeDefined();
     });
   });
 
-  describe('createBlog', () => {
-    it('POSTs the payload and caches the created entry', async () => {
+  describe('getFallbackBlogs', () => {
+    it('reads the bundled sample data', async () => {
+      const promise = service.getFallbackBlogs();
+
+      const req = httpMock.expectOne(FALLBACK);
+      expect(req.request.method).toBe('GET');
+      req.flush([entry({ id: 42 })]);
+
+      const blogs = await promise;
+      expect(blogs[0].id).toBe(42);
+    });
+  });
+
+  describe('write operations', () => {
+    it('POSTs the payload and returns the created entry', async () => {
       const promise = service.createBlog({
         title: 'Neuer Beitrag',
         contentPreview: 'Ein frischer Text.',
@@ -153,31 +138,22 @@ describe('BlogService', () => {
       expect(req.request.body).toMatchObject({ title: 'Neuer Beitrag', author: 'Nuri' });
       req.flush(entry({ id: 99, title: 'Neuer Beitrag' }));
 
-      const created = await promise;
-      expect(created?.id).toBe(99);
-      expect(service.getById(99)?.title).toBe('Neuer Beitrag');
+      expect((await promise).id).toBe(99);
     });
 
-    it('keeps the entry locally when the backend is unreachable', async () => {
+    it('rejects when the created entry comes back malformed', async () => {
       const promise = service.createBlog({
-        title: 'Offline-Beitrag',
-        contentPreview: 'Wird lokal gehalten.',
+        title: 'Neuer Beitrag',
+        contentPreview: 'Ein frischer Text.',
         author: 'Nuri',
       });
 
-      httpMock.expectOne(API).flush('down', { status: 503, statusText: 'Unavailable' });
+      httpMock.expectOne(API).flush({ nonsense: true });
 
-      const created = await promise;
-      expect(created?.title).toBe('Offline-Beitrag');
-      expect(service.offline()).toBe(true);
-      expect(service.blogs()).toHaveLength(1);
+      await expect(promise).rejects.toThrow(/unexpected shape/);
     });
-  });
 
-  describe('updateBlog', () => {
-    it('PUTs to the entry URL and replaces the cached entry', async () => {
-      await seed();
-
+    it('PUTs to the entry URL', async () => {
       const promise = service.updateBlog(1, {
         title: 'Überarbeitet',
         contentPreview: 'Neuer Inhalt.',
@@ -188,46 +164,17 @@ describe('BlogService', () => {
       expect(req.request.method).toBe('PUT');
       req.flush(entry({ title: 'Überarbeitet' }));
 
-      await promise;
-      expect(service.getById(1)?.title).toBe('Überarbeitet');
-      expect(service.blogs()).toHaveLength(1);
+      expect((await promise).title).toBe('Überarbeitet');
     });
-  });
 
-  describe('deleteBlog', () => {
-    it('DELETEs the entry and drops it from the cache', async () => {
-      await seed();
-
+    it('DELETEs the entry URL', async () => {
       const promise = service.deleteBlog(1);
+
       const req = httpMock.expectOne(`${API}/1`);
       expect(req.request.method).toBe('DELETE');
       req.flush(null);
 
-      expect(await promise).toBe(true);
-      expect(service.getById(1)).toBeUndefined();
-    });
-
-    it('still removes the entry locally when the backend rejects', async () => {
-      await seed();
-
-      const promise = service.deleteBlog(1);
-      httpMock.expectOne(`${API}/1`).flush('nope', { status: 503, statusText: 'Unavailable' });
-
-      expect(await promise).toBe(false);
-      expect(service.getById(1)).toBeUndefined();
-      expect(service.offline()).toBe(true);
-    });
-  });
-
-  describe('toggleLike', () => {
-    it('flips the flag and adjusts the counter', async () => {
-      await seed();
-
-      service.toggleLike(1);
-      expect(service.getById(1)).toMatchObject({ likedByMe: true, likes: 4 });
-
-      service.toggleLike(1);
-      expect(service.getById(1)).toMatchObject({ likedByMe: false, likes: 3 });
+      await expect(promise).resolves.toBeUndefined();
     });
   });
 });

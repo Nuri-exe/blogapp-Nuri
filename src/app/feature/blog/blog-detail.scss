@@ -94,6 +94,17 @@
     --mdc-filled-button-label-text-color: var(--mat-sys-on-error);
   }
 
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-sm;
+    margin: 0 0 v.$spacing-lg;
+    padding: v.$spacing-sm v.$spacing-md;
+    border-radius: v.$radius-md;
+    background-color: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  }
+
   &__missing {
     text-align: center;
     padding: v.$spacing-xl;

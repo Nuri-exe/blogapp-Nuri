@@ -11,6 +11,20 @@
     </a>
   </header>
 
+  <div class="blog-list__toolbar">
+    <mat-form-field appearance="outline" class="blog-list__filter" subscriptSizing="dynamic">
+      <mat-label>Autor</mat-label>
+      <mat-select [value]="selectedAuthor()" (valueChange)="onAuthorChange($event)">
+        <mat-option [value]="allAuthors">Alle Autoren</mat-option>
+        @for (author of authors(); track author) {
+          <mat-option [value]="author">{{ author }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <p class="blog-list__count">{{ blogs().length }} von {{ blogCount() }} Beiträgen</p>
+  </div>
+
   @if (offline()) {
     <p class="blog-list__notice" role="status">
       <mat-icon aria-hidden="true">cloud_off</mat-icon>
@@ -36,7 +50,13 @@
       @for (b of blogs(); track b.id) {
         <app-blog-card [blog]="b" (like)="onLike($event)" />
       } @empty {
-        <p class="blog-list__empty">Noch keine Beiträge vorhanden.</p>
+        <p class="blog-list__empty">
+          @if (blogCount() === 0) {
+            Noch keine Beiträge vorhanden.
+          } @else {
+            Keine Beiträge von diesem Autor.
+          }
+        </p>
       }
     </div>
   }
