@@ -14,6 +14,10 @@ import { z } from 'zod';
  * neither routed to nor rendered. Every other field falls back to a neutral
  * default, so a backend that renames or drops a field degrades a single card
  * instead of taking down the whole overview.
+ *
+ * @expected-unused Reached only through `await import('./blog-schema')` in
+ * BlogService, which static analysis cannot follow. A plain import would pull
+ * zod into the initial bundle — the very thing this split avoids.
  */
 export const blogSchema = z.object({
   id: z.number(),
@@ -36,6 +40,9 @@ export const blogSchema = z.object({
  * The list endpoint answers with a paginated envelope (`{ data, pageIndex, … }`),
  * while the local fallback file is a bare array. Accept both shapes and unwrap
  * to the raw item list; each item is then validated on its own.
+ *
+ * @expected-unused Same as `blogSchema` — loaded through the dynamic import in
+ * BlogService, not a static one.
  */
 export const blogListPayloadSchema = z.union([
   z.array(z.unknown()),
