@@ -1,0 +1,75 @@
+<section class="blog-form">
+  <a routerLink="/blogs" class="blog-form__back">
+    <mat-icon aria-hidden="true">arrow_back</mat-icon>
+    <span>Zurück zur Übersicht</span>
+  </a>
+
+  <mat-card class="blog-form__card" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>{{ isEdit() ? 'Beitrag bearbeiten' : 'Neuer Beitrag' }}</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (loading()) {
+        <div class="blog-form__loading" role="status" aria-live="polite">
+          <mat-spinner diameter="40" />
+          <p>Beitrag wird geladen …</p>
+        </div>
+      } @else {
+        @if (error(); as message) {
+          <p class="blog-form__error" role="alert">
+            <mat-icon aria-hidden="true">error_outline</mat-icon>
+            <span>{{ message }}</span>
+          </p>
+        }
+
+        <form [formGroup]="form" class="blog-form__fields" (ngSubmit)="onSubmit()">
+          <mat-form-field appearance="outline">
+            <mat-label>Titel</mat-label>
+            <input matInput formControlName="title" required />
+            @if (form.controls.title.hasError('required')) {
+              <mat-error>Titel ist erforderlich.</mat-error>
+            } @else if (form.controls.title.hasError('minlength')) {
+              <mat-error>Mindestens 3 Zeichen.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Autor</mat-label>
+            <input matInput formControlName="author" required />
+            @if (form.controls.author.hasError('required')) {
+              <mat-error>Autor ist erforderlich.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Inhalt</mat-label>
+            <textarea matInput formControlName="contentPreview" rows="6" required></textarea>
+            @if (form.controls.contentPreview.hasError('required')) {
+              <mat-error>Inhalt ist erforderlich.</mat-error>
+            } @else if (form.controls.contentPreview.hasError('minlength')) {
+              <mat-error>Mindestens 10 Zeichen.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Bild-URL (optional)</mat-label>
+            <input matInput formControlName="headerImageUrl" />
+          </mat-form-field>
+
+          <div class="blog-form__actions">
+            <button mat-flat-button type="submit" [disabled]="saving()">
+              @if (saving()) {
+                <mat-spinner diameter="20" />
+                <span>Speichern …</span>
+              } @else {
+                <span>{{ isEdit() ? 'Änderungen speichern' : 'Beitrag erstellen' }}</span>
+              }
+            </button>
+            <a mat-stroked-button routerLink="/blogs">Abbrechen</a>
+          </div>
+        </form>
+      }
+    </mat-card-content>
+  </mat-card>
+</section>

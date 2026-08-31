@@ -1,18 +1,39 @@
-@let posts = blogs();
-
 <section class="blog-list">
   <header class="blog-list__intro">
-    <h1>Aktuelle Beiträge</h1>
-    <p>Geschichten, Tutorials und Erfahrungen aus der Web-Development-Welt.</p>
+    <div>
+      <h1>Aktuelle Beiträge</h1>
+      <p>Geschichten, Tutorials und Erfahrungen aus der Web-Development-Welt.</p>
+    </div>
+
+    <a mat-flat-button routerLink="/blogs/new" class="blog-list__new">
+      <mat-icon>add</mat-icon>
+      <span>Neuer Beitrag</span>
+    </a>
   </header>
 
-  @if (posts === null) {
-    <div class="blog-list__loading">
+  @if (offline()) {
+    <p class="blog-list__notice" role="status">
+      <mat-icon aria-hidden="true">cloud_off</mat-icon>
+      <span>Backend nicht erreichbar — es werden lokale Beispieldaten angezeigt.</span>
+    </p>
+  }
+
+  @if (error(); as message) {
+    <p class="blog-list__error" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <span>{{ message }}</span>
+      <button mat-stroked-button type="button" (click)="reload()">Erneut versuchen</button>
+    </p>
+  }
+
+  @if (loading()) {
+    <div class="blog-list__loading" role="status" aria-live="polite">
       <mat-spinner diameter="48" />
+      <p>Beiträge werden geladen …</p>
     </div>
   } @else {
     <div class="blog-list__grid">
-      @for (b of posts; track b.id) {
+      @for (b of blogs(); track b.id) {
         <app-blog-card [blog]="b" (like)="onLike($event)" />
       } @empty {
         <p class="blog-list__empty">Noch keine Beiträge vorhanden.</p>
