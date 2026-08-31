@@ -10,7 +10,10 @@ on:
     branches: ["main"]
 
 env:
-  NODE_VERSION: 22
+  # Angular 22 requires Node.js ^22.22.3 || ^24.15.0 || >=26.0.0.
+  # 26 matches azure-deploy.yml and avoids setup-node resolving `22` to
+  # a patch that predates 22.22.3 in some manifests.
+  NODE_VERSION: 26
 
 jobs:
   ci:
