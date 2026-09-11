@@ -23,6 +23,11 @@
     </mat-form-field>
 
     <p class="blog-list__count">{{ blogs().length }} von {{ blogCount() }} Beiträgen</p>
+
+    <a mat-stroked-button routerLink="/blogs/create" class="blog-list__compose">
+      <mat-icon>edit_note</mat-icon>
+      <span>Schreiben</span>
+    </a>
   </div>
 
   @if (offline()) {
