@@ -25,7 +25,7 @@ export interface BlogDraft {
 }
 
 /** Options for the category select: stored value plus the label shown to the user. */
-export const BLOG_CATEGORIES = [
+const BLOG_CATEGORIES = [
   { value: 'general', label: 'Allgemein' },
   { value: 'tech', label: 'Technik' },
   { value: 'lifestyle', label: 'Lifestyle' },

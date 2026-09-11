@@ -98,7 +98,7 @@
               <span>Damit du abschicken kannst, fehlt noch:</span>
             </p>
             <ul>
-              @for (issue of issues; track issue) {
+              @for (issue of issues; track $index) {
                 <li>{{ issue }}</li>
               }
             </ul>
