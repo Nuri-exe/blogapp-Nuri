@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 
+import { AuthStore } from '../../core/auth/auth-store';
 import { BlogCard } from '../../shared/blog-card/blog-card';
 import { ALL_AUTHORS, BlogStateService } from './blog-state-service';
 
@@ -26,6 +27,9 @@ import { ALL_AUTHORS, BlogStateService } from './blog-state-service';
 })
 export class BlogList implements OnInit {
   private readonly state = inject(BlogStateService);
+
+  /** Hides the create action for visitors who could not use it anyway. */
+  protected readonly auth = inject(AuthStore);
 
   // Read-only views onto the central state — the component cannot write to it.
   protected readonly blogs = this.state.filteredBlogs;

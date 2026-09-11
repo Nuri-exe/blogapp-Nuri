@@ -29,7 +29,6 @@ function backendMock() {
   return {
     getBlogs: vi.fn<() => Promise<Blog[]>>(),
     getFallbackBlogs: vi.fn<() => Promise<Blog[]>>(),
-    getBlog: vi.fn<() => Promise<Blog>>(),
     createBlog: vi.fn<() => Promise<Blog>>(),
     updateBlog: vi.fn<() => Promise<Blog>>(),
     deleteBlog: vi.fn<() => Promise<void>>(),

@@ -25,19 +25,6 @@ test.describe('HFTM Blog app', () => {
     await expect(toggle).toHaveAttribute('aria-pressed', /true|false/);
   });
 
-  test('opens the create form and validates required fields', async ({ page }) => {
-    await page.goto('/');
-
-    await page.getByRole('link', { name: 'Neuer Beitrag' }).click();
-    await expect(page).toHaveURL(/\/blogs\/new$/);
-    await expect(page.locator('mat-card-title')).toContainText('Neuer Beitrag');
-
-    // Submitting an empty form must not navigate away; the required errors show up.
-    await page.getByRole('button', { name: 'Beitrag erstellen' }).click();
-    await expect(page).toHaveURL(/\/blogs\/new$/);
-    await expect(page.locator('mat-error').first()).toBeVisible();
-  });
-
   test('validates the signal form before it allows a submit', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('link', { name: 'Schreiben' }).click();
@@ -102,20 +89,29 @@ test.describe('HFTM Blog app', () => {
 
     await expect(page).toHaveURL(/\/blogs\/\d+$/);
     await expect(page.locator('.blog-detail__title')).toContainText(title);
-    await expect(page.getByRole('link', { name: 'Bearbeiten' })).toBeVisible();
   });
 
-  test('prefills the edit form from the store', async ({ page }) => {
-    await page.goto('/');
+  // This build ships with environment.authEnabled = false, because the static
+  // hosting target cannot run the BFF. The guard must therefore keep the
+  // write routes out of reach and the UI must not advertise them.
+  test('keeps the write routes out of reach without a usable auth backend', async ({ page }) => {
+    await page.goto('/blogs/new');
+    await expect(page).toHaveURL(/\/blogs$/);
 
-    const firstTitle = page.locator('app-blog-card .blog-card__title-link').first();
-    const title = (await firstTitle.textContent())?.trim() ?? '';
-    await firstTitle.click();
-    await expect(page).toHaveURL(/\/blogs\/\d+$/);
+    await page.goto('/blogs/1/edit');
+    await expect(page).toHaveURL(/\/blogs$/);
 
-    await page.getByRole('link', { name: 'Bearbeiten' }).click();
-    await expect(page).toHaveURL(/\/blogs\/\d+\/edit$/);
-    await expect(page.locator('mat-card-title')).toContainText('Beitrag bearbeiten');
-    await expect(page.locator('input[formcontrolname="title"]')).toHaveValue(title);
+    await expect(page.locator('.blog-list__new')).toHaveCount(0);
+    await expect(page.locator('[data-testid="login"]')).toHaveCount(0);
+  });
+
+  test('renders the login page and its error from the query string', async ({ page }) => {
+    await page.goto('/login?error=access_denied');
+
+    await expect(page.locator('mat-card-title')).toContainText('Anmelden');
+    await expect(page.locator('[data-testid="login-error"]')).toContainText('abgebrochen');
+
+    // No form: the password is only ever typed on Keycloak's own page.
+    await expect(page.locator('input[type="password"]')).toHaveCount(0);
   });
 });
