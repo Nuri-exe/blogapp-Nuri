@@ -53,27 +53,31 @@
 
         <span class="blog-detail__spacer"></span>
 
-        <a mat-stroked-button [routerLink]="['/blogs', p.id, 'edit']">
-          <mat-icon>edit</mat-icon>
-          <span>Bearbeiten</span>
-        </a>
+        @if (auth.canWrite()) {
+          <a mat-stroked-button [routerLink]="['/blogs', p.id, 'edit']">
+            <mat-icon>edit</mat-icon>
+            <span>Bearbeiten</span>
+          </a>
 
-        @if (confirmingDelete()) {
-          <button
-            mat-flat-button
-            type="button"
-            class="blog-detail__delete-confirm"
-            [disabled]="deleting()"
-            (click)="onDelete()"
-          >
-            {{ deleting() ? 'Wird gelöscht …' : 'Wirklich löschen' }}
-          </button>
-          <button mat-button type="button" (click)="confirmingDelete.set(false)">Abbrechen</button>
-        } @else {
-          <button mat-stroked-button type="button" (click)="confirmingDelete.set(true)">
-            <mat-icon>delete</mat-icon>
-            <span>Löschen</span>
-          </button>
+          @if (confirmingDelete()) {
+            <button
+              mat-flat-button
+              type="button"
+              class="blog-detail__delete-confirm"
+              [disabled]="deleting()"
+              (click)="onDelete()"
+            >
+              {{ deleting() ? 'Wird gelöscht …' : 'Wirklich löschen' }}
+            </button>
+            <button mat-button type="button" (click)="confirmingDelete.set(false)">
+              Abbrechen
+            </button>
+          } @else {
+            <button mat-stroked-button type="button" (click)="confirmingDelete.set(true)">
+              <mat-icon>delete</mat-icon>
+              <span>Löschen</span>
+            </button>
+          }
         }
       </mat-card-actions>
     </mat-card>

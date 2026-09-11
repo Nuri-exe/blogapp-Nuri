@@ -1,0 +1,47 @@
+@use '../../styles/variables' as v;
+@use '../../styles/mixins' as m;
+
+.login {
+  @include m.flex-center;
+  padding: v.$spacing-2xl v.$spacing-lg;
+
+  &__card {
+    width: 100%;
+    max-width: 460px;
+    border-radius: v.$radius-lg;
+    background-color: var(--mat-sys-surface);
+    color: var(--mat-sys-on-surface);
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: v.$spacing-md;
+    padding-top: v.$spacing-md;
+
+    p {
+      margin: 0;
+      color: var(--mat-sys-on-surface-variant);
+      line-height: 1.6;
+    }
+  }
+
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: v.$spacing-sm;
+    align-self: stretch;
+    padding: v.$spacing-sm v.$spacing-md;
+    border-radius: v.$radius-md;
+    background-color: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container) !important;
+  }
+
+  &__disabled {
+    align-self: stretch;
+    padding: v.$spacing-sm v.$spacing-md;
+    border-radius: v.$radius-md;
+    background-color: var(--mat-sys-surface-container-high);
+  }
+}

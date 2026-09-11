@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 
+import { AuthStore } from '../../core/auth/auth-store';
 import { BlogStateService } from './blog-state-service';
 
 @Component({
@@ -18,6 +19,9 @@ import { BlogStateService } from './blog-state-service';
 export class BlogDetail {
   private readonly state = inject(BlogStateService);
   private readonly router = inject(Router);
+
+  /** Hides the edit/delete actions for visitors who could not use them anyway. */
+  protected readonly auth = inject(AuthStore);
 
   readonly id = input.required<string>();
 

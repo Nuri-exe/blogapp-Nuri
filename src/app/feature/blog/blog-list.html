@@ -5,10 +5,12 @@
       <p>Geschichten, Tutorials und Erfahrungen aus der Web-Development-Welt.</p>
     </div>
 
-    <a mat-flat-button routerLink="/blogs/new" class="blog-list__new">
-      <mat-icon>add</mat-icon>
-      <span>Neuer Beitrag</span>
-    </a>
+    @if (auth.canWrite()) {
+      <a mat-flat-button routerLink="/blogs/new" class="blog-list__new">
+        <mat-icon>add</mat-icon>
+        <span>Neuer Beitrag</span>
+      </a>
+    }
   </header>
 
   <div class="blog-list__toolbar">

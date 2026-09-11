@@ -13,6 +13,20 @@
 
   <span class="app-header__spacer"></span>
 
+  <!-- Waiting for the session check keeps a signed-in user from seeing "Login"
+       flash before their name resolves. -->
+  @if (authEnabled && !auth.loading()) {
+    @if (auth.isAuthenticated()) {
+      <span class="app-header__user" data-testid="current-user">
+        <mat-icon aria-hidden="true">account_circle</mat-icon>
+        <span>{{ displayName() }}</span>
+      </span>
+      <button mat-button type="button" data-testid="logout" (click)="onLogout()">Logout</button>
+    } @else {
+      <a mat-button routerLink="/login" data-testid="login">Login</a>
+    }
+  }
+
   <button
     mat-icon-button
     type="button"
