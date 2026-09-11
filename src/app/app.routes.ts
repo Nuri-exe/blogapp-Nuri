@@ -16,6 +16,12 @@ export const routes: Routes = [
     loadComponent: () => import('./feature/blog/blog-form').then((m) => m.BlogForm),
     title: 'Neuer Beitrag — HFTM Blog',
   },
+  // Same reason as 'blogs/new' above — must stay ahead of 'blogs/:id'.
+  {
+    path: 'blogs/create',
+    loadComponent: () => import('./feature/blog/blog-create').then((m) => m.BlogCreate),
+    title: 'Beitrag schreiben — HFTM Blog',
+  },
   {
     path: 'blogs/:id',
     loadComponent: () => import('./feature/blog/blog-detail').then((m) => m.BlogDetail),

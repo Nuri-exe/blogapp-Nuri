@@ -1,0 +1,122 @@
+@let title = blogForm.title();
+@let content = blogForm.content();
+@let category = blogForm.category();
+@let issues = openIssues();
+
+<section class="blog-create">
+  <a routerLink="/blogs" class="blog-create__back">
+    <mat-icon aria-hidden="true">arrow_back</mat-icon>
+    <span>Zurück zur Übersicht</span>
+  </a>
+
+  <mat-card class="blog-create__card" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Neuen Beitrag schreiben</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (saveError(); as message) {
+        <p class="blog-create__save-error" role="alert">
+          <mat-icon aria-hidden="true">error_outline</mat-icon>
+          <span>{{ message }}</span>
+        </p>
+      }
+
+      <form class="blog-create__form" novalidate (submit)="onSubmit($event)">
+        <div class="blog-create__field">
+          <label for="blog-title">Titel</label>
+          <input
+            id="blog-title"
+            type="text"
+            autocomplete="off"
+            [formField]="blogForm.title"
+            [class.is-invalid]="title.touched() && title.invalid()"
+            [attr.aria-invalid]="title.touched() && title.invalid()"
+            [attr.aria-describedby]="
+              title.touched() && title.invalid() ? 'blog-title-errors' : null
+            "
+          />
+          @if (title.touched() && title.invalid()) {
+            <ul id="blog-title-errors" class="blog-create__errors">
+              @for (error of title.errors(); track error.kind) {
+                <li>{{ error.message ?? error.kind }}</li>
+              }
+            </ul>
+          }
+        </div>
+
+        <div class="blog-create__field">
+          <label for="blog-content">Inhalt</label>
+          <textarea
+            id="blog-content"
+            rows="8"
+            [formField]="blogForm.content"
+            [class.is-invalid]="content.touched() && content.invalid()"
+            [attr.aria-invalid]="content.touched() && content.invalid()"
+            [attr.aria-describedby]="
+              content.touched() && content.invalid() ? 'blog-content-errors' : null
+            "
+          ></textarea>
+          @if (content.touched() && content.invalid()) {
+            <ul id="blog-content-errors" class="blog-create__errors">
+              @for (error of content.errors(); track error.kind) {
+                <li>{{ error.message ?? error.kind }}</li>
+              }
+            </ul>
+          }
+        </div>
+
+        <div class="blog-create__field">
+          <label for="blog-category">Kategorie</label>
+          <select
+            id="blog-category"
+            [formField]="blogForm.category"
+            [class.is-invalid]="category.touched() && category.invalid()"
+          >
+            @for (option of categories; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+          @if (category.touched() && category.invalid()) {
+            <ul class="blog-create__errors">
+              @for (error of category.errors(); track error.kind) {
+                <li>{{ error.message ?? error.kind }}</li>
+              }
+            </ul>
+          }
+        </div>
+
+        <!--
+          A disabled button plus errors that only show after a field was touched
+          means a first-time visitor sees a dead button and no reason. This block
+          always names what is still missing.
+        -->
+        @if (issues.length > 0) {
+          <div class="blog-create__pending" role="status" aria-live="polite">
+            <p class="blog-create__pending-title">
+              <mat-icon aria-hidden="true">info_outline</mat-icon>
+              <span>Damit du abschicken kannst, fehlt noch:</span>
+            </p>
+            <ul>
+              @for (issue of issues; track issue) {
+                <li>{{ issue }}</li>
+              }
+            </ul>
+          </div>
+        }
+
+        <div class="blog-create__actions">
+          <button mat-flat-button type="submit" [disabled]="blogForm().invalid()">
+            @if (blogForm().submitting()) {
+              <mat-spinner diameter="20" />
+              <span>Wird gespeichert …</span>
+            } @else {
+              <span>Beitrag veröffentlichen</span>
+            }
+          </button>
+          <a mat-stroked-button routerLink="/blogs">Abbrechen</a>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</section>
