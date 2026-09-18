@@ -25,6 +25,40 @@ test.describe('HFTM Blog app', () => {
     await expect(toggle).toHaveAttribute('aria-pressed', /true|false/);
   });
 
+  test('validates the signal form before it allows a submit', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('link', { name: 'Schreiben' }).click();
+    await expect(page).toHaveURL(/\/blogs\/create$/);
+
+    const submit = page.getByRole('button', { name: 'Beitrag veröffentlichen' });
+    await expect(submit).toBeDisabled();
+
+    // The button is disabled from the start, so the reason has to be on screen
+    // without the user touching anything first.
+    await expect(page.locator('.blog-create__pending')).toContainText('Titel ist erforderlich.');
+
+    // Errors on a field only appear once it was left.
+    const title = page.locator('#blog-title');
+    await title.fill('Hallo! Welt?');
+    await title.blur();
+    await expect(page.locator('#blog-title-errors')).toContainText('Nur Buchstaben');
+
+    await title.fill('Mein erster Beitrag');
+    await expect(page.locator('#blog-title-errors')).toHaveCount(0);
+
+    // Content shorter than twice the title keeps the form invalid.
+    const content = page.locator('#blog-content');
+    await content.fill('Viel zu kurz.');
+    await content.blur();
+    await expect(page.locator('#blog-content-errors')).toContainText('doppelt so lang');
+    await expect(submit).toBeDisabled();
+
+    await content.fill('Ein Inhalt, der locker doppelt so lang ist wie der Titel dieses Beitrags.');
+    await expect(page.locator('#blog-content-errors')).toHaveCount(0);
+    await expect(page.locator('.blog-create__pending')).toHaveCount(0);
+    await expect(submit).toBeEnabled();
+  });
+
   test('filters the overview by author and remembers the choice', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('app-blog-card').first()).toBeVisible();

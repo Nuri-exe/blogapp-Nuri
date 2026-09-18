@@ -20,6 +20,18 @@ export const routes: Routes = [
     loadComponent: () => import('./feature/blog/blog-form').then((m) => m.BlogForm),
     title: 'Neuer Beitrag — HFTM Blog',
   },
+  // Same reason as 'blogs/new' above — must stay ahead of 'blogs/:id'.
+  //
+  // Deliberately without authGuard, unlike the two routes around it: this build
+  // ships with authEnabled = false, so the guard would redirect every visitor
+  // and the form would be unreachable in the deployed app. Nothing is exposed by
+  // leaving it open — the guard is UI polish, the BFF and the backend are what
+  // actually reject an unauthorised write.
+  {
+    path: 'blogs/create',
+    loadComponent: () => import('./feature/blog/blog-create').then((m) => m.BlogCreate),
+    title: 'Beitrag schreiben — HFTM Blog',
+  },
   {
     path: 'blogs/:id',
     loadComponent: () => import('./feature/blog/blog-detail').then((m) => m.BlogDetail),
