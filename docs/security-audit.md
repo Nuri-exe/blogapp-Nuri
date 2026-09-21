@@ -178,6 +178,36 @@ Fehler ab, aber der Browser meldet den Versuch trotzdem als
 `blog-schema.ts` überspringt die Probe. Ein E2E-Test zählt die Verstösse über
 Übersicht, Detailseite und Login und erwartet null.
 
+## Fallow-Befunde und warum fünf Pakete bleiben
+
+Fallow meldet Pakete als ungenutzt, die kein TypeScript-File direkt
+importiert. Fünf davon sind trotzdem nötig — geprüft, nicht angenommen, und in
+`.fallowrc.json` unter `ignoreDependencies` eingetragen:
+
+| Paket                        | Wird gebraucht über                                                         |
+| ---------------------------- | --------------------------------------------------------------------------- |
+| `@angular/animations`        | `@angular/platform-browser/animations` (Quelle von `provideNoopAnimations`) |
+| `@fontsource/roboto`         | `angular.json` → `styles`                                                   |
+| `@fontsource/material-icons` | `angular.json` → `styles`                                                   |
+| `@angular-eslint/builder`    | `angular.json` → Lint-Builder                                               |
+| `@angular-eslint/schematics` | `ng generate`                                                               |
+
+Der erste ist der lehrreiche: Fallow bot dafür `"auto_fixable": remove-dependency`
+an. Nach dem Entfernen fielen drei Test-Dateien mit
+`Cannot find package '@angular/animations'` um — die Abhängigkeit ist transitiv
+über einen Subpath-Import, den die Analyse nicht sieht. Ein blind ausgeführtes
+`fallow fix` hätte die Testsuite zerlegt.
+
+`Header.focusNav` wird aus der Sidebar über `viewChild.required(Header)`
+aufgerufen; dieser Indirektion kann die Analyse nicht folgen, daher eine
+Inline-Unterdrückung direkt über dem Symbol.
+
+Dabei kam auch heraus, dass die `@expected-unused`-JSDoc-Tags an den
+zod-Schemas nie etwas bewirkt haben: Fallow hat eine eigene Syntax
+(`fallow-ignore-next-line`), und die Direktive muss **unmittelbar** über dem
+Symbol stehen — ein erklärender Kommentar dazwischen macht sie stale, was
+Fallow selbst als `stale_suppressions` meldet.
+
 ## npm audit (Experte)
 
 Vorher: **29 Befunde** (1 critical, 18 high, 6 moderate, 4 low). Die ernsten
