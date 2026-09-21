@@ -97,6 +97,41 @@ describe('BlogService (backend gateway)', () => {
       expect(blog.headerImageUrl).toBeUndefined();
     });
 
+    it('drops a date the DatePipe could not render', async () => {
+      const promise = service.getBlogs();
+      httpMock
+        .expectOne(API)
+        .flush([
+          entry({ id: 1, createdAt: 'gestern', updatedAt: 'n/a' }),
+          entry({ id: 2, createdAt: '2026-02-15T10:30:00' }),
+        ]);
+
+      // Angular's toDate() throws RuntimeError 2311 for an unparsable
+      // non-empty string, and it does so inside change detection.
+      const blogs = await promise;
+      expect(blogs[0].createdAt).toBe('');
+      expect(blogs[0].updatedAt).toBe('');
+      expect(blogs[1].createdAt).toBe('2026-02-15T10:30:00');
+    });
+
+    it('keeps only https image locations', async () => {
+      const promise = service.getBlogs();
+      httpMock
+        .expectOne(API)
+        .flush([
+          entry({ id: 1, headerImageUrl: 'http://insecure.example/a.png' }),
+          entry({ id: 2, headerImageUrl: 'javascript:alert(1)' }),
+          entry({ id: 3, headerImageUrl: 'https://cdn.example/b.png' }),
+        ]);
+
+      const blogs = await promise;
+      expect(blogs.map((blog) => blog.headerImageUrl)).toEqual([
+        undefined,
+        undefined,
+        'https://cdn.example/b.png',
+      ]);
+    });
+
     it('returns an empty list when the payload has no recognisable shape', async () => {
       const promise = service.getBlogs();
       httpMock.expectOne(API).flush({ unexpected: true });

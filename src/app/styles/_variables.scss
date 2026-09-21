@@ -13,8 +13,13 @@ $radius-lg: 16px;
 
 // Layout
 $content-max-width: 1200px;
-$header-height: 64px;
 
 // Motion
 $transition-fast: 150ms ease-in-out;
 $transition-base: 250ms ease-in-out;
+
+// Breakpoints — mobile first, so media queries use min-width and the smallest
+// screen is the one that needs no query at all.
+// $breakpoint-tablet must match DESKTOP_MEDIA_QUERY in core/layout/layout-service.ts.
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;

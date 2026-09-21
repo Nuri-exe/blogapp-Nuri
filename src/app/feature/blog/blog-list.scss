@@ -77,8 +77,27 @@
     }
   }
 
+  // Aufgabe 2 — Flexbox, mobile first. Without a media query every card takes
+  // the whole row; the two breakpoints only shrink the basis. flex-wrap lets
+  // the cards fall into the next line, and flex-grow stays 0 so a last row
+  // with fewer cards keeps the column width instead of stretching to fill it.
   &__grid {
-    @include m.responsive-grid(300px, v.$spacing-lg);
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$spacing-lg;
+  }
+
+  &__card {
+    flex: 0 0 100%;
+    min-width: 0;
+
+    @media (min-width: v.$breakpoint-tablet) {
+      flex-basis: calc((100% - #{v.$spacing-lg}) / 2);
+    }
+
+    @media (min-width: v.$breakpoint-desktop) {
+      flex-basis: calc((100% - 2 * #{v.$spacing-lg}) / 3);
+    }
   }
 
   &__loading {
@@ -94,6 +113,9 @@
   }
 
   &__empty {
+    // A flex item is only as wide as its text — claim the whole row so
+    // text-align: center actually centres it.
+    flex: 1 1 100%;
     text-align: center;
     color: var(--mat-sys-on-surface-variant);
     padding-block: v.$spacing-xl;

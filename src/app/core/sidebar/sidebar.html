@@ -1,0 +1,46 @@
+<mat-sidenav-container class="shell">
+  <mat-sidenav
+    #drawer
+    class="shell__drawer"
+    mode="over"
+    role="dialog"
+    aria-label="Navigation"
+    fixedInViewport
+  >
+    <!-- Rendered on narrow screens only: on desktop the same links live in the
+         toolbar, and having both in the DOM would announce every link twice. -->
+    @if (layout.isMobile()) {
+      <nav class="shell__nav" aria-label="Hauptnavigation">
+        <mat-nav-list>
+          <a
+            mat-list-item
+            routerLink="/blogs"
+            routerLinkActive
+            #blogsLink="routerLinkActive"
+            [activated]="blogsLink.isActive"
+            (click)="drawer.close()"
+          >
+            <mat-icon matListItemIcon aria-hidden="true">article</mat-icon>
+            <span matListItemTitle>Beiträge</span>
+          </a>
+          <a
+            mat-list-item
+            routerLink="/about"
+            routerLinkActive
+            #aboutLink="routerLinkActive"
+            [activated]="aboutLink.isActive"
+            (click)="drawer.close()"
+          >
+            <mat-icon matListItemIcon aria-hidden="true">info</mat-icon>
+            <span matListItemTitle>Über</span>
+          </a>
+        </mat-nav-list>
+      </nav>
+    }
+  </mat-sidenav>
+
+  <mat-sidenav-content class="shell__content">
+    <app-header (menuToggle)="drawer.toggle()" />
+    <ng-content />
+  </mat-sidenav-content>
+</mat-sidenav-container>

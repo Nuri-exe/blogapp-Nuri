@@ -1,16 +1,28 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
   <head>
     <meta charset="utf-8" />
-    <title>Angular Template</title>
+    <!--
+      Content Security Policy. Delivered as a meta tag because the deployment
+      target (an Azure Storage static website) cannot set HTTP response headers;
+      the equivalent header, and what only a header can do (frame-ancestors),
+      is documented in docs/security-audit.md.
+
+      Fonts and icons are bundled from @fontsource (see angular.json), which is
+      what allows style-src and font-src to stay at 'self'. 'unsafe-inline' for
+      styles is required by Angular (component styles are injected as <style>
+      elements) and Angular Material (inline style attributes). img-src allows
+      https: because header images are arbitrary URLs from the backend. The
+      connect-src host is the production API from src/environments/environment.ts.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https:; connect-src 'self' https://d-cap-blog-backend---v2.whitepond-b96fee4b.westeurope.azurecontainerapps.io; object-src 'none'; base-uri 'self'; form-action 'self'"
+    />
+    <title>HFTM Blog</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
-      rel="stylesheet"
-    />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   </head>
   <body class="mat-typography">
     <app-root></app-root>
