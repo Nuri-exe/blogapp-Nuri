@@ -130,6 +130,17 @@ X-Content-Type-Options: nosniff
 Referrer-Policy: strict-origin-when-cross-origin
 ```
 
+### Die Policy gilt auch für `ng serve`
+
+Das Meta-Tag steht in `src/index.html` und landet damit in beiden Builds. Der
+Dev-Server braucht einen WebSocket für Live-Reload, und `connect-src 'self'`
+deckt gleichnamige `ws://`-Verbindungen erst seit CSP Level 3 ab — das ist
+eine klassische Stolperfalle. Nachgemessen statt angenommen: mit laufendem
+`ng serve` öffnet der Browser `ws://localhost:4300/?token=…`, und
+`securitypolicyviolation` feuert kein einziges Mal. Auch `connect-src` passt
+in der Entwicklung, weil `environment.development.ts` die API über den Proxy
+auf dieselbe Origin legt (`apiBaseUrl: '/api'`).
+
 ### zod und `script-src`
 
 zod probiert beim ersten Validieren einmal `new Function('')`, um zu
