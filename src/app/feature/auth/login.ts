@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 
 import { environment } from '../../../environments/environment';
+import { DEFAULT_RETURN_URL, safeReturnUrl } from '../../core/auth/return-url';
 
 /** Messages the BFF callback can redirect here with. */
 const ERROR_MESSAGES: Record<string, string> = {
@@ -28,7 +29,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 })
 export default class Login {
   // Bound from the query string via withComponentInputBinding().
-  readonly returnUrl = input('/blogs');
+  readonly returnUrl = input(DEFAULT_RETURN_URL);
   readonly error = input<string | undefined>();
 
   protected readonly authEnabled = environment.authEnabled;
@@ -41,12 +42,18 @@ export default class Login {
   });
 
   /**
+   * The query string is attacker-controlled, so the redirect target is
+   * validated before it goes anywhere near a navigation — see `safeReturnUrl`.
+   */
+  protected readonly target = computed(() => safeReturnUrl(this.returnUrl()));
+
+  /**
    * A full navigation, not a fetch: the browser has to follow the BFF's 302 to
    * Keycloak and carry the `__pkce` cookie back to the callback. A fetch would
    * follow the redirect invisibly and drop the user on a CORS error.
    */
   protected signIn(): void {
-    const returnUrl = encodeURIComponent(this.returnUrl());
+    const returnUrl = encodeURIComponent(this.target());
     window.location.href = `${environment.bffUrl}/auth/login?returnUrl=${returnUrl}`;
   }
 }
