@@ -43,3 +43,9 @@ body {
     background-color v.$transition-base,
     color v.$transition-base;
 }
+
+// The sidenav shell sizes itself to its host, so the host has to have a height.
+app-root {
+  display: block;
+  height: 100%;
+}

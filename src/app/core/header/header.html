@@ -1,6 +1,19 @@
 @let dark = theme.isDark();
 
 <mat-toolbar class="app-header">
+  @if (layout.isMobile()) {
+    <button
+      mat-icon-button
+      type="button"
+      class="app-header__menu"
+      aria-label="Navigation öffnen"
+      data-testid="menu-toggle"
+      (click)="menuToggle.emit()"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+  }
+
   <a routerLink="/" class="app-header__brand">
     <mat-icon aria-hidden="true">article</mat-icon>
     <span>{{ title }}</span>

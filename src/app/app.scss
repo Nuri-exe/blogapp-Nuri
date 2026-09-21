@@ -1,6 +1,6 @@
-@use './styles/variables' as v;
-
+// Projected into the shell's sidenav content (a flex column), so growing to
+// the bottom is a matter of flex, not of subtracting the toolbar height.
 .app-content {
-  min-height: calc(100vh - #{v.$header-height});
+  flex: 1 1 auto;
   background-color: var(--mat-sys-background);
 }

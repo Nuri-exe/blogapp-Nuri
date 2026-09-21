@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,6 +7,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { environment } from '../../../environments/environment';
 import { AuthStore } from '../auth/auth-store';
+import { LayoutService } from '../layout/layout-service';
 import { ThemeService } from '../theme/theme-service';
 
 @Component({
@@ -27,7 +28,14 @@ import { ThemeService } from '../theme/theme-service';
 export class Header {
   protected readonly theme = inject(ThemeService);
   protected readonly auth = inject(AuthStore);
+  protected readonly layout = inject(LayoutService);
   protected readonly title = 'HFTM Blog';
+
+  /**
+   * The hamburger only asks for "the menu"; what that opens is the shell's
+   * decision (the drawer in `Sidebar`). Shown on narrow screens only.
+   */
+  readonly menuToggle = output<void>();
 
   /** Hidden entirely where no BFF is reachable — a sign-in button would 404. */
   protected readonly authEnabled = environment.authEnabled;

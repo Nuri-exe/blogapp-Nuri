@@ -9,7 +9,12 @@ mat-toolbar.app-header {
   display: flex;
   align-items: center;
   gap: v.$spacing-md;
-  padding-inline: v.$spacing-lg;
+  padding-inline: v.$spacing-md;
+
+  @media (min-width: v.$breakpoint-tablet) {
+    padding-inline: v.$spacing-lg;
+  }
+
   background: linear-gradient(135deg, var(--mat-sys-primary) 0%, var(--mat-sys-tertiary) 100%);
   color: var(--mat-sys-on-primary);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
@@ -35,10 +40,24 @@ mat-toolbar.app-header {
     }
   }
 
+  // Aufgabe 3 — below the tablet breakpoint the links move into the drawer,
+  // where they stack along the column axis (sidebar.scss); from 768px on they
+  // sit in the toolbar along the row axis. flex-direction is the switch.
   &__nav {
-    display: flex;
-    gap: v.$spacing-sm;
-    margin-inline-start: v.$spacing-lg;
+    display: none;
+
+    @media (min-width: v.$breakpoint-tablet) {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: v.$spacing-sm;
+      margin-inline-start: v.$spacing-lg;
+    }
+  }
+
+  &__menu {
+    color: inherit;
+    margin-inline-end: v.$spacing-xs;
   }
 
   &__link {
