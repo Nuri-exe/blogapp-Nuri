@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+
+  "//": "Packages that no TypeScript file imports directly, so fallow reports them as unused. Each is genuinely required — verified, not assumed.",
+
+  "ignoreDependencies": [
+    "@angular/animations",
+    "@fontsource/roboto",
+    "@fontsource/material-icons",
+    "@angular-eslint/builder",
+    "@angular-eslint/schematics"
+  ]
+}

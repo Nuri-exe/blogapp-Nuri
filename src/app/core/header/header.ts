@@ -62,6 +62,9 @@ export class Header {
    * hamburger that Material would restore focus to has just been removed from
    * the DOM, so focus would otherwise fall back to <body>.
    */
+  // Called from Sidebar through `viewChild.required(Header)` — an indirection
+  // fallow cannot follow, hence the suppression.
+  // fallow-ignore-next-line unused-class-member
   focusNav(): void {
     this.firstNavLink()?.nativeElement.focus();
   }

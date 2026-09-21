@@ -26,9 +26,10 @@ z.config({ jitless: true });
  * default, so a backend that renames or drops a field degrades a single card
  * instead of taking down the whole overview.
  *
- * @expected-unused Reached only through `await import('./blog-schema')` in
- * BlogService, which static analysis cannot follow. A plain import would pull
- * zod into the initial bundle — the very thing this split avoids.
+ * Reached only through `await import('./blog-schema')` in BlogService, which
+ * static analysis cannot follow — hence the fallow suppression below. A plain
+ * import would pull zod into the initial bundle, the very thing this split
+ * avoids.
  */
 /**
  * A date string the `DatePipe` can actually render.
@@ -43,6 +44,7 @@ const isoDate = z
   .default('')
   .transform((value) => (value && !Number.isNaN(Date.parse(value)) ? value : ''));
 
+// fallow-ignore-next-line unused-export
 export const blogSchema = z.object({
   id: z.number(),
   title: z.string(),
@@ -69,9 +71,10 @@ export const blogSchema = z.object({
  * while the local fallback file is a bare array. Accept both shapes and unwrap
  * to the raw item list; each item is then validated on its own.
  *
- * @expected-unused Same as `blogSchema` — loaded through the dynamic import in
- * BlogService, not a static one.
+ * Same as `blogSchema` — loaded through the dynamic import in BlogService,
+ * not a static one.
  */
+// fallow-ignore-next-line unused-export
 export const blogListPayloadSchema = z.union([
   z.array(z.unknown()),
   z.object({ data: z.array(z.unknown()) }),
