@@ -264,6 +264,27 @@ test.describe('on a phone', () => {
   });
 });
 
+test.describe('on a very narrow phone', () => {
+  test.use({ viewport: { width: 320, height: 640 }, isMobile: true });
+
+  test('keeps every toolbar control inside the viewport', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('mat-toolbar')).toBeVisible();
+
+    // mat-toolbar clips its overflow instead of scrolling it, so a control
+    // pushed past the edge is not merely ugly — it is unreachable. The brand
+    // text is the only item allowed to give up room (min-width: 0 + ellipsis).
+    const toolbar = await page.locator('mat-toolbar').evaluate((element) => ({
+      content: element.scrollWidth,
+      box: element.clientWidth,
+      lastControlRight: Math.round(element.lastElementChild.getBoundingClientRect().right),
+    }));
+
+    expect(toolbar.content).toBeLessThanOrEqual(toolbar.box);
+    expect(toolbar.lastControlRight).toBeLessThanOrEqual(320);
+  });
+});
+
 test.describe('on a tablet', () => {
   test.use({ viewport: { width: 800, height: 1100 } });
 

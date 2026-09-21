@@ -41,6 +41,14 @@ Messung im Browser:
 | 21  | `src/app/core/sidebar/sidebar.ts:54`      | Beim Wachsen über den Breakpoint fiel der Tastaturfokus auf `<body>`                                         | Niedrig | Der Header nimmt den Fokus entgegen                              |
 | 22  | `playwright.config.ts:20`                 | `npm run e2e` lief lokal gegen `ng serve` (`authEnabled: true`) und widersprach den eigenen Zusicherungen    | Niedrig | Beide Umgebungen fahren den Produktions-Build                    |
 
+| 23 | `src/app/core/header/header.scss` | Bei 320px mit aktiviertem Auth war der Toolbar-Inhalt 358px breit — Material clippt statt zu scrollen, der Theme-Umschalter war unerreichbar | Niedrig | Marken- und Benutzertext dürfen schrumpfen (`min-width: 0`, Ellipse) |
+
+Nummer 23 fiel erst auf, weil der Verifier gegen den **Entwicklungs-Build**
+gemessen hat: dort ist `authEnabled: true`, also rendert der Header zusätzlich
+den Login- beziehungsweise Benutzer-Block. Meine eigene Overflow-Messung lief
+gegen den Produktions-Build, wo dieser Block gar nicht existiert — der Fehler
+war dort schlicht unsichtbar. Nachgemessen und behoben bis hinunter auf 280px.
+
 Nummer 16 ist die Pointe: genau die Falle, die weiter unten unter „CSP" als
 Stolperstein beschrieben ist, ist beim Umsetzen trotzdem zugeschnappt. Der
 E2E-Test prüfte, ob die Schrift _geladen_ war (`document.fonts.check`) — nicht,
