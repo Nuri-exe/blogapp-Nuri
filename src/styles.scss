@@ -49,3 +49,24 @@ app-root {
   display: block;
   height: 100%;
 }
+
+// @fontsource ships the @font-face declaration and nothing else. Google's
+// stylesheet also carried the class rule that binds the ligature font to the
+// element — without it every <mat-icon> falls back to Roboto and renders its
+// ligature name as clipped text ("article", "menu", "dark_mode").
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}

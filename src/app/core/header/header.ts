@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, inject, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  computed,
+  inject,
+  output,
+  viewChild,
+} from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -44,6 +52,19 @@ export class Header {
     const user = this.auth.user();
     return user?.name || user?.preferred_username || 'Angemeldet';
   });
+
+  private readonly firstNavLink = viewChild<ElementRef<HTMLAnchorElement>>('firstNavLink');
+
+  /**
+   * Moves keyboard focus into the toolbar navigation.
+   *
+   * Called by the shell after it closes the drawer on a breakpoint change: the
+   * hamburger that Material would restore focus to has just been removed from
+   * the DOM, so focus would otherwise fall back to <body>.
+   */
+  focusNav(): void {
+    this.firstNavLink()?.nativeElement.focus();
+  }
 
   protected toggleTheme(): void {
     this.theme.toggle();

@@ -48,11 +48,22 @@ export class Sidebar {
 
   private readonly drawer = viewChild(MatSidenav);
 
+  private readonly header = viewChild.required(Header);
+
   constructor() {
     // Growing past the breakpoint removes the drawer's links, so an overlay
     // left open there would only dim an empty panel.
     effect(() => {
-      if (!this.layout.isMobile()) void this.drawer()?.close();
+      if (this.layout.isMobile()) return;
+
+      const drawer = this.drawer();
+      if (!drawer?.opened) return;
+
+      // Material restores focus to whatever opened the drawer — but that is
+      // the hamburger, which the same breakpoint change removes from the DOM.
+      // Focus would land on <body>, so a keyboard user would start over at the
+      // top of the document. Hand it to the toolbar link instead.
+      void drawer.close().then(() => this.header().focusNav());
     });
   }
 }

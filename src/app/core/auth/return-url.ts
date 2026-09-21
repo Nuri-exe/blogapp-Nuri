@@ -32,7 +32,13 @@ export function safeReturnUrl(candidate: string | null | undefined): string {
   try {
     const url = new URL(value, ORIGIN_PROBE);
     if (url.origin !== ORIGIN_PROBE) return DEFAULT_RETURN_URL;
-    return url.pathname + url.search + url.hash;
+
+    // The check above ran on the input; this one runs on what came out of the
+    // parser. `/..//evil.example` passes the input check (single leading
+    // slash) and normalises to `//evil.example` — protocol-relative, i.e. a
+    // different host. Re-checking the result is what closes that.
+    const path = url.pathname + url.search + url.hash;
+    return path.startsWith('//') ? DEFAULT_RETURN_URL : path;
   } catch {
     return DEFAULT_RETURN_URL;
   }

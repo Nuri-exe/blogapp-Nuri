@@ -1,9 +1,11 @@
 @use '../../styles/variables' as v;
 @use '../../styles/mixins' as m;
 
+// No height here on purpose: `align-items: stretch` only applies when the
+// item's cross size is `auto`, so pinning the host to 100% would opt every
+// card out of stretching and leave a row of ragged cards.
 :host {
   display: block;
-  height: 100%;
 }
 
 .blog-card {

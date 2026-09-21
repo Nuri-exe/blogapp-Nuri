@@ -76,6 +76,43 @@ test.describe('HFTM Blog app', () => {
     expect(await columnCount(page)).toBe(3);
   });
 
+  test('keeps the toolbar on screen while the page scrolls', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('app-blog-card').first()).toBeVisible();
+
+    // The shell scrolls inside .mat-drawer-content, not on the document, so a
+    // sticky toolbar only works if the sticky element is the flex item itself.
+    const top = await page.evaluate(async () => {
+      const scroller = document.querySelector('.mat-drawer-content');
+      scroller.scrollTop = 600;
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      return Math.round(document.querySelector('mat-toolbar').getBoundingClientRect().top);
+    });
+
+    expect(top).toBeGreaterThanOrEqual(-1);
+  });
+
+  test('gives the cards in a row the same height', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('app-blog-card').nth(2)).toBeVisible();
+
+    // align-items: stretch only bites while the card's cross size is auto — a
+    // height on the host would silently opt every card out of it.
+    const rows = await page.locator('app-blog-card').evaluateAll((elements) => {
+      const byRow = {};
+      for (const element of elements) {
+        const rect = element.getBoundingClientRect();
+        (byRow[Math.round(rect.top)] ||= []).push(Math.round(rect.height));
+      }
+      return Object.values(byRow);
+    });
+
+    expect(rows.length).toBeGreaterThan(0);
+    for (const heights of rows) {
+      expect(new Set(heights).size).toBe(1);
+    }
+  });
+
   test('filters the overview by author and remembers the choice', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('app-blog-card').first()).toBeVisible();
@@ -153,13 +190,20 @@ test.describe('HFTM Blog app', () => {
     await page.goto('/');
     await expect(page.locator('mat-icon').first()).toBeVisible();
 
-    // The ligature font has to be loaded, otherwise every <mat-icon> shows its
-    // name as plain text ("menu", "dark_mode", …).
-    const iconFontReady = await page.evaluate(async () => {
-      await document.fonts.load('24px "Material Icons"');
-      return document.fonts.check('24px "Material Icons"');
-    });
-    expect(iconFontReady).toBe(true);
+    // Loading the font is not enough — it also has to be APPLIED. @fontsource
+    // ships only the @font-face, so without the .material-icons class rule
+    // every icon falls back to Roboto and renders its ligature name as text.
+    // Measured, not assumed: a real glyph fits the 24px box, the word does not.
+    const icon = await page
+      .locator('mat-icon')
+      .first()
+      .evaluate((element) => ({
+        fontFamily: getComputedStyle(element).fontFamily,
+        contentWidth: element.scrollWidth,
+        boxWidth: Math.round(element.getBoundingClientRect().width),
+      }));
+    expect(icon.fontFamily).toContain('Material Icons');
+    expect(icon.contentWidth).toBeLessThanOrEqual(icon.boxWidth + 2);
 
     const origin = new URL(page.url()).origin;
     const fontRequests = await page.evaluate(() =>
@@ -196,6 +240,10 @@ test.describe('on a phone', () => {
     await menu.click();
     const drawer = page.locator('mat-sidenav');
     await expect(drawer).toBeVisible();
+
+    // An overlay, not a side panel: it covers the page rather than shifting it.
+    await expect(drawer).toHaveClass(/mat-drawer-over/);
+    await expect(page.locator('.mat-drawer-backdrop.mat-drawer-shown')).toBeVisible();
 
     // The links stack vertically: same left edge, increasing top edge.
     const links = drawer.locator('.shell__nav a');

@@ -111,6 +111,15 @@ export class BlogForm {
 
     try {
       const id = this.blogId();
+
+      // On the edit route an unparsable :id ('/blogs/abc/edit') leaves blogId()
+      // null. Falling through to the create branch here would silently publish
+      // a new entry instead of editing the one the link pointed at.
+      if (this.isEdit() && id === null) {
+        this.error.set('Dieser Beitrag konnte nicht geladen werden.');
+        return;
+      }
+
       const saved =
         id === null
           ? await this.state.createBlog(payload)

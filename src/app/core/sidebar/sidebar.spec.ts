@@ -55,6 +55,13 @@ describe('Sidebar', () => {
     expect(host.querySelector('mat-sidenav-content app-header')).toBeTruthy();
   });
 
+  it('opens as an overlay, never as a side panel that shifts the page', () => {
+    // 'side' is what the Material schematic generates; it would push the
+    // content sideways on a phone instead of covering it.
+    expect(drawer().mode).toBe('over');
+    expect(drawer().fixedInViewport).toBe(true);
+  });
+
   it('shows neither hamburger nor drawer links on desktop', () => {
     expect(menuButton()).toBeNull();
     expect(drawerLinks()).toEqual([]);

@@ -24,6 +24,13 @@ describe('safeReturnUrl', () => {
     ['tab', '/blogs\t'],
     ['relative path without slash', 'blogs/1'],
     ['scheme-looking path', 'https:/evil.example'],
+    // These pass the leading-slash check and only become protocol-relative
+    // once the URL parser resolves the dot segments.
+    ['dot segments collapsing to protocol-relative', '/..//evil.example'],
+    ['nested dot segments', '/../..//evil.example'],
+    ['dot segments after a real segment', '/a/..//evil.example'],
+    ['single dot then dot-dot', '/./..//evil.example'],
+    ['dot segments with a path', '/..//evil.example/phish'],
   ])('falls back to the overview for %s', (_label, input) => {
     expect(safeReturnUrl(input)).toBe(DEFAULT_RETURN_URL);
   });

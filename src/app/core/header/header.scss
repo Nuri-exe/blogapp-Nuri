@@ -18,6 +18,13 @@ mat-toolbar.app-header {
   background: linear-gradient(135deg, var(--mat-sys-primary) 0%, var(--mat-sys-tertiary) 100%);
   color: var(--mat-sys-on-primary);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+// The shell projects this component as a flex item of a column container, so
+// the host box is exactly as tall as the toolbar. A sticky toolbar inside it
+// would have no room to travel — the host is the element that has to stick.
+:host {
+  display: block;
   position: sticky;
   top: 0;
   z-index: 10;
