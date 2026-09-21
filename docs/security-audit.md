@@ -26,30 +26,30 @@ Gefühl.
 
 ### Im Review gefunden — Regressionen dieses Branches
 
-Ein adversarialer Review über den fertigen Diff. Diese vier hatte der Branch
-selbst eingebaut, drei davon hätte niemand am Code gesehen — sie brauchten eine
-Messung im Browser:
+Ein adversarialer Review über den fertigen Diff, in fünf unabhängigen
+Durchgängen mit anschliessender Gegenprüfung jedes einzelnen Befunds. Die
+Nummern 12 bis 15 hatte der Branch selbst eingebaut, und drei davon hätte
+niemand am Code gesehen — sie brauchten eine Messung im Browser:
 
-| Nr. | Datei                                     | Problem                                                                                                      | Risiko  | Fix                                                              |
-| --- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------- | ---------------------------------------------------------------- |
-| 15  | `src/app/core/auth/return-url.ts:35`      | `'/..//evil.example'` normalisiert zu `'//evil.example'` — der Open-Redirect-Fix war selbst umgehbar         | Hoch    | Prüfung läuft jetzt auch auf dem Ergebnis, nicht nur der Eingabe |
-| 16  | `angular.json:34`                         | `@fontsource` liefert nur das `@font-face`; ohne Klassenregel zeigt jedes `<mat-icon>` seinen Namen als Text | Hoch    | `.material-icons`-Regel in `styles.scss`                         |
-| 17  | `src/app/core/header/header.scss`         | Sticky-Toolbar klebte nicht mehr: im Flex-Column-Shell ist der Host nur toolbarhoch                          | Mittel  | `position: sticky` auf den `:host` verschoben                    |
-| 18  | `src/app/shared/blog-card/blog-card.scss` | Karten einer Reihe verschieden hoch (448/261/476px): `height: 100%` schaltet `align-items: stretch` ab       | Niedrig | Höhe am Host entfernt                                            |
-| 19  | `src/app/feature/blog/blog-form.ts:60`    | `/blogs/abc/edit` legte still einen **neuen** Beitrag an, statt zu scheitern                                 | Mittel  | Edit-Route mit unbrauchbarer id meldet einen Fehler              |
-| 20  | `src/app/core/header/header.html:23`      | `aria-current` fehlte an den Toolbar-Links, während der Drawer es setzte                                     | Niedrig | An beiden Stellen gesetzt                                        |
-| 21  | `src/app/core/sidebar/sidebar.ts:54`      | Beim Wachsen über den Breakpoint fiel der Tastaturfokus auf `<body>`                                         | Niedrig | Der Header nimmt den Fokus entgegen                              |
-| 22  | `playwright.config.ts:20`                 | `npm run e2e` lief lokal gegen `ng serve` (`authEnabled: true`) und widersprach den eigenen Zusicherungen    | Niedrig | Beide Umgebungen fahren den Produktions-Build                    |
+| Nr. | Datei                                     | Problem                                                                                                                                      | Risiko  | Fix                                                                  |
+| --- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------- |
+| 12  | `src/app/core/auth/return-url.ts:35`      | `'/..//evil.example'` normalisiert zu `'//evil.example'` — der Open-Redirect-Fix war selbst umgehbar                                         | Hoch    | Prüfung läuft jetzt auch auf dem Ergebnis, nicht nur der Eingabe     |
+| 13  | `angular.json:34`                         | `@fontsource` liefert nur das `@font-face`; ohne Klassenregel zeigt jedes `<mat-icon>` seinen Namen als Text                                 | Hoch    | `.material-icons`-Regel in `styles.scss`                             |
+| 14  | `src/app/core/header/header.scss`         | Sticky-Toolbar klebte nicht mehr: im Flex-Column-Shell ist der Host nur toolbarhoch                                                          | Mittel  | `position: sticky` auf den `:host` verschoben                        |
+| 15  | `src/app/shared/blog-card/blog-card.scss` | Karten einer Reihe verschieden hoch (448/261/476px): `height: 100%` schaltet `align-items: stretch` ab                                       | Niedrig | Höhe am Host entfernt                                                |
+| 16  | `src/app/feature/blog/blog-form.ts:60`    | `/blogs/abc/edit` legte still einen **neuen** Beitrag an, statt zu scheitern                                                                 | Mittel  | Edit-Route mit unbrauchbarer id meldet einen Fehler                  |
+| 17  | `src/app/core/header/header.html:23`      | `aria-current` fehlte an den Toolbar-Links, während der Drawer es setzte                                                                     | Niedrig | An beiden Stellen gesetzt                                            |
+| 18  | `src/app/core/sidebar/sidebar.ts:54`      | Beim Wachsen über den Breakpoint fiel der Tastaturfokus auf `<body>`                                                                         | Niedrig | Der Header nimmt den Fokus entgegen                                  |
+| 19  | `playwright.config.ts:20`                 | `npm run e2e` lief lokal gegen `ng serve` (`authEnabled: true`) und widersprach den eigenen Zusicherungen                                    | Niedrig | Beide Umgebungen fahren den Produktions-Build                        |
+| 20  | `src/app/core/header/header.scss`         | Bei 320px mit aktiviertem Auth war der Toolbar-Inhalt 358px breit — Material clippt statt zu scrollen, der Theme-Umschalter war unerreichbar | Niedrig | Marken- und Benutzertext dürfen schrumpfen (`min-width: 0`, Ellipse) |
 
-| 23 | `src/app/core/header/header.scss` | Bei 320px mit aktiviertem Auth war der Toolbar-Inhalt 358px breit — Material clippt statt zu scrollen, der Theme-Umschalter war unerreichbar | Niedrig | Marken- und Benutzertext dürfen schrumpfen (`min-width: 0`, Ellipse) |
-
-Nummer 23 fiel erst auf, weil der Verifier gegen den **Entwicklungs-Build**
+Nummer 20 fiel erst auf, weil der Verifier gegen den **Entwicklungs-Build**
 gemessen hat: dort ist `authEnabled: true`, also rendert der Header zusätzlich
 den Login- beziehungsweise Benutzer-Block. Meine eigene Overflow-Messung lief
 gegen den Produktions-Build, wo dieser Block gar nicht existiert — der Fehler
 war dort schlicht unsichtbar. Nachgemessen und behoben bis hinunter auf 280px.
 
-Nummer 16 ist die Pointe: genau die Falle, die weiter unten unter „CSP" als
+Nummer 13 ist die Pointe: genau die Falle, die weiter unten unter „CSP" als
 Stolperstein beschrieben ist, ist beim Umsetzen trotzdem zugeschnappt. Der
 E2E-Test prüfte, ob die Schrift _geladen_ war (`document.fonts.check`) — nicht,
 ob sie _angewendet_ wurde. Er misst jetzt die gerenderte Breite gegen die
@@ -67,9 +67,9 @@ ein eigenes Ticket, nicht in diesen PR:
 
 | Nr. | Datei                                   | Problem                                                                                           | Risiko  | Empfehlung                                                         |
 | --- | --------------------------------------- | ------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------ |
-| 12  | `.github/workflows/azure-deploy.yml:46` | Deploy authentisiert mit einem unbefristeten Storage-Account-Key (Vollzugriff auf alle Container) | Mittel  | OIDC-Federation mit RBAC auf den `$web`-Container                  |
-| 13  | `.github/workflows/azure-deploy.yml:9`  | Deploy läuft bei jedem Push auf `main`, unabhängig davon, ob die CI grün ist                      | Mittel  | An den CI-Workflow koppeln, `concurrency`-Gruppe setzen            |
-| 14  | `.github/workflows/*.yml`               | Actions auf bewegliche Tags gepinnt (`azure/CLI@v3`) statt auf Commit-SHAs                        | Niedrig | Auf SHA pinnen — betrifft genau den Schritt, der die Secrets sieht |
+| 21  | `.github/workflows/azure-deploy.yml:46` | Deploy authentisiert mit einem unbefristeten Storage-Account-Key (Vollzugriff auf alle Container) | Mittel  | OIDC-Federation mit RBAC auf den `$web`-Container                  |
+| 22  | `.github/workflows/azure-deploy.yml:9`  | Deploy läuft bei jedem Push auf `main`, unabhängig davon, ob die CI grün ist                      | Mittel  | An den CI-Workflow koppeln, `concurrency`-Gruppe setzen            |
+| 23  | `.github/workflows/*.yml`               | Actions auf bewegliche Tags gepinnt (`azure/CLI@v3`) statt auf Commit-SHAs                        | Niedrig | Auf SHA pinnen — betrifft genau den Schritt, der die Secrets sieht |
 
 ## Was sauber war
 
