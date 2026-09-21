@@ -97,6 +97,24 @@ describe('BlogService (backend gateway)', () => {
       expect(blog.headerImageUrl).toBeUndefined();
     });
 
+    it('keeps only https image locations', async () => {
+      const promise = service.getBlogs();
+      httpMock
+        .expectOne(API)
+        .flush([
+          entry({ id: 1, headerImageUrl: 'http://insecure.example/a.png' }),
+          entry({ id: 2, headerImageUrl: 'javascript:alert(1)' }),
+          entry({ id: 3, headerImageUrl: 'https://cdn.example/b.png' }),
+        ]);
+
+      const blogs = await promise;
+      expect(blogs.map((blog) => blog.headerImageUrl)).toEqual([
+        undefined,
+        undefined,
+        'https://cdn.example/b.png',
+      ]);
+    });
+
     it('returns an empty list when the payload has no recognisable shape', async () => {
       const promise = service.getBlogs();
       httpMock.expectOne(API).flush({ unexpected: true });

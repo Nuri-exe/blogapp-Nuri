@@ -1,6 +1,17 @@
 import { z } from 'zod';
 
 /**
+ * Stop zod from probing whether `eval` is available.
+ *
+ * Without this, zod runs `new Function('')` once to decide whether it may
+ * compile a faster validator. It catches the failure, so nothing breaks — but
+ * the browser still counts the attempt as a `script-src` violation and
+ * reports it, which under our CSP means a console error on every first
+ * validation. `jitless` skips the probe and keeps the interpreted path.
+ */
+z.config({ jitless: true });
+
+/**
  * Runtime validation for everything the backend hands us.
  *
  * This module is loaded lazily by `BlogService` (zod costs ~65 kB gzipped), so
@@ -28,10 +39,14 @@ export const blogSchema = z.object({
   comments: z.number().default(0),
   likedByMe: z.boolean().default(false),
   createdByMe: z.boolean().default(false),
+  // Only an https location is kept. An http image would be mixed content on
+  // the deployed site, and anything without a scheme is not an image address
+  // at all — the CSP (img-src) enforces the same rule in the browser, this
+  // keeps the model honest one step earlier.
   headerImageUrl: z
     .string()
     .nullish()
-    .transform((value) => value ?? undefined),
+    .transform((value) => (value && /^https:\/\//i.test(value) ? value : undefined)),
   createdAt: z.string().default(''),
   updatedAt: z.string().default(''),
 });
