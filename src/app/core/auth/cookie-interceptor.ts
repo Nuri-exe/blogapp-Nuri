@@ -24,23 +24,20 @@ export const cookieInterceptor: HttpInterceptorFn = (req, next) => {
 };
 
 function isBffRequest(url: string): boolean {
-  const bffUrl = environment.bffUrl;
+  // Both forms go through the parser: a relative base ('/api') because
+  // HttpClient hands absolute URLs to interceptors once a <base href> is in
+  // play, an absolute one so the origin is compared rather than assumed.
+  try {
+    const base = new URL(environment.bffUrl, window.location.origin);
+    const target = new URL(url, window.location.origin);
 
-  // A relative base ('/api') has to be matched on the path, because HttpClient
-  // hands absolute URLs to interceptors once a <base href> is in play.
-  if (bffUrl.startsWith('/')) {
-    try {
-      const target = new URL(url, window.location.origin);
-      // Same origin only: a plain path check would also match
-      // https://other.example/api/... and hand that host our cookies.
-      if (target.origin !== window.location.origin) return false;
-      return isUnderPath(target.pathname, bffUrl);
-    } catch {
-      return false;
-    }
+    // Origin first: a path-only check would also match
+    // https://other.example/api/... and hand that host our cookies.
+    if (target.origin !== base.origin) return false;
+    return isUnderPath(target.pathname, base.pathname);
+  } catch {
+    return false;
   }
-
-  return url.startsWith(bffUrl);
 }
 
 /**
@@ -49,8 +46,13 @@ function isBffRequest(url: string): boolean {
  * A bare `startsWith` would also accept `/api-internal` and `/apikeys` for the
  * base `/api` — different endpoints that would then receive the session cookie
  * and the CSRF header.
+ *
+ * A base of `/` is refused outright rather than treated as "everything":
+ * a BFF mounted at the origin root would otherwise put credentials on every
+ * request the app makes, the bundled `/data/blogs.json` fallback included.
  */
 function isUnderPath(pathname: string, base: string): boolean {
   const normalised = base.endsWith('/') ? base.slice(0, -1) : base;
+  if (normalised === '') return false;
   return pathname === normalised || pathname.startsWith(`${normalised}/`);
 }

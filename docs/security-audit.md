@@ -24,6 +24,33 @@ Gefühl.
 | 10  | `src/index.html:9`                           | Google Fonts von fremder Origin: bricht unter `style-src 'self'` und verrät Besucher-IPs an Google        | Niedrig | `@fontsource/roboto` + `@fontsource/material-icons` gebündelt, `<link>`-Tags entfernt       |
 | 11  | `package.json`                               | 29 npm-Advisories, darunter Sanitizer-Bypässe in Angular selbst                                           | Hoch    | Auf 22.1.7 gehoben, `npm audit fix`; jetzt 0 Befunde                                        |
 
+### Im Review gefunden — Regressionen dieses Branches
+
+Ein adversarialer Review über den fertigen Diff. Diese vier hatte der Branch
+selbst eingebaut, drei davon hätte niemand am Code gesehen — sie brauchten eine
+Messung im Browser:
+
+| Nr. | Datei                                     | Problem                                                                                                      | Risiko  | Fix                                                              |
+| --- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------- | ---------------------------------------------------------------- |
+| 15  | `src/app/core/auth/return-url.ts:35`      | `'/..//evil.example'` normalisiert zu `'//evil.example'` — der Open-Redirect-Fix war selbst umgehbar         | Hoch    | Prüfung läuft jetzt auch auf dem Ergebnis, nicht nur der Eingabe |
+| 16  | `angular.json:34`                         | `@fontsource` liefert nur das `@font-face`; ohne Klassenregel zeigt jedes `<mat-icon>` seinen Namen als Text | Hoch    | `.material-icons`-Regel in `styles.scss`                         |
+| 17  | `src/app/core/header/header.scss`         | Sticky-Toolbar klebte nicht mehr: im Flex-Column-Shell ist der Host nur toolbarhoch                          | Mittel  | `position: sticky` auf den `:host` verschoben                    |
+| 18  | `src/app/shared/blog-card/blog-card.scss` | Karten einer Reihe verschieden hoch (448/261/476px): `height: 100%` schaltet `align-items: stretch` ab       | Niedrig | Höhe am Host entfernt                                            |
+| 19  | `src/app/feature/blog/blog-form.ts:60`    | `/blogs/abc/edit` legte still einen **neuen** Beitrag an, statt zu scheitern                                 | Mittel  | Edit-Route mit unbrauchbarer id meldet einen Fehler              |
+| 20  | `src/app/core/header/header.html:23`      | `aria-current` fehlte an den Toolbar-Links, während der Drawer es setzte                                     | Niedrig | An beiden Stellen gesetzt                                        |
+| 21  | `src/app/core/sidebar/sidebar.ts:54`      | Beim Wachsen über den Breakpoint fiel der Tastaturfokus auf `<body>`                                         | Niedrig | Der Header nimmt den Fokus entgegen                              |
+| 22  | `playwright.config.ts:20`                 | `npm run e2e` lief lokal gegen `ng serve` (`authEnabled: true`) und widersprach den eigenen Zusicherungen    | Niedrig | Beide Umgebungen fahren den Produktions-Build                    |
+
+Nummer 16 ist die Pointe: genau die Falle, die weiter unten unter „CSP" als
+Stolperstein beschrieben ist, ist beim Umsetzen trotzdem zugeschnappt. Der
+E2E-Test prüfte, ob die Schrift _geladen_ war (`document.fonts.check`) — nicht,
+ob sie _angewendet_ wurde. Er misst jetzt die gerenderte Breite gegen die
+24px-Box: ein echtes Glyph passt hinein, das Wort „article" nicht.
+
+Dass die neuen Tests greifen, ist nachgewiesen und nicht behauptet: mit
+zurückgedrehtem Fix fallen genau die zugehörigen Tests um — drei E2E
+(Icons, Sticky, Kartenhöhen) und fünf Unit (Redirect-Varianten).
+
 ### Befunde, die dokumentiert und nicht behoben wurden
 
 Diese betreffen die Deployment-Pipeline, nicht die Anwendung. Sie brauchen
