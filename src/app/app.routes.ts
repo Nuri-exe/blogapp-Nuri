@@ -18,6 +18,9 @@ export const routes: Routes = [
     path: 'blogs/new',
     canMatch: [authGuard],
     loadComponent: () => import('./feature/blog/blog-form').then((m) => m.BlogForm),
+    // Route data beats query parameters in withComponentInputBinding()'s merge,
+    // so '?id=7' cannot talk this page into editing an existing entry.
+    data: { mode: 'create' },
     title: 'Neuer Beitrag — HFTM Blog',
   },
   // Same reason as 'blogs/new' above — must stay ahead of 'blogs/:id'.
@@ -43,6 +46,7 @@ export const routes: Routes = [
     path: 'blogs/:id/edit',
     canMatch: [authGuard],
     loadComponent: () => import('./feature/blog/blog-form').then((m) => m.BlogForm),
+    data: { mode: 'edit' },
     title: 'Beitrag bearbeiten — HFTM Blog',
   },
   {

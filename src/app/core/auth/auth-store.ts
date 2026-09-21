@@ -113,10 +113,29 @@ export class AuthStore {
       });
 
       const { logoutUrl } = (await response.json()) as { logoutUrl?: string };
-      window.location.href = logoutUrl ?? '/';
+      window.location.href = safeLogoutUrl(logoutUrl);
     } catch (error) {
       console.error('[AuthStore] Logout failed — returning to the start page.', error);
       window.location.href = '/';
     }
+  }
+}
+
+/**
+ * Keeps the BFF's `logoutUrl` to something a browser may be sent to.
+ *
+ * The value is server data rather than user input, so this is not an open
+ * redirect — but `location.href` sits outside Angular's sanitizer, and a
+ * `javascript:` string there would run in this origin. Only http(s) and
+ * same-origin paths pass; anything else lands on the start page.
+ */
+function safeLogoutUrl(candidate: string | undefined): string {
+  if (!candidate) return '/';
+
+  try {
+    const url = new URL(candidate, window.location.origin);
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : '/';
+  } catch {
+    return '/';
   }
 }

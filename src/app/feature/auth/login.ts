@@ -7,12 +7,20 @@ import { MatIconModule } from '@angular/material/icon';
 import { environment } from '../../../environments/environment';
 import { DEFAULT_RETURN_URL, safeReturnUrl } from '../../core/auth/return-url';
 
-/** Messages the BFF callback can redirect here with. */
-const ERROR_MESSAGES: Record<string, string> = {
-  access_denied: 'Die Anmeldung wurde abgebrochen.',
-  expired: 'Der Anmeldeversuch ist abgelaufen. Bitte versuche es erneut.',
-  failed: 'Die Anmeldung ist fehlgeschlagen. Bitte versuche es erneut.',
-};
+const GENERIC_ERROR = 'Die Anmeldung ist fehlgeschlagen. Bitte versuche es erneut.';
+
+/**
+ * Messages the BFF callback can redirect here with.
+ *
+ * A `Map`, not an object literal: the key comes from the query string, and a
+ * plain object would happily resolve inherited keys — `?error=constructor`
+ * rendered `function Object() { [native code] }` straight into the page.
+ */
+const ERROR_MESSAGES = new Map<string, string>([
+  ['access_denied', 'Die Anmeldung wurde abgebrochen.'],
+  ['expired', 'Der Anmeldeversuch ist abgelaufen. Bitte versuche es erneut.'],
+  ['failed', GENERIC_ERROR],
+]);
 
 /**
  * Sign-in page — deliberately without a form.
@@ -38,7 +46,7 @@ export default class Login {
   protected readonly errorMessage = computed(() => {
     const error = this.error();
     if (!error) return null;
-    return ERROR_MESSAGES[error] ?? ERROR_MESSAGES['failed'];
+    return ERROR_MESSAGES.get(error) ?? GENERIC_ERROR;
   });
 
   /**

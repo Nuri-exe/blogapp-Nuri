@@ -44,11 +44,24 @@ export class BlogForm {
   /** Bound from the `:id` route param on /blogs/:id/edit; absent on /blogs/new. */
   readonly id = input<string>();
 
+  /**
+   * Set from the route's static `data`, never from the URL.
+   *
+   * `withComponentInputBinding()` merges query parameters into component
+   * inputs as `{...queryParams, ...params, ...data}`. On /blogs/new there is no
+   * `:id` route parameter to take precedence, so `/blogs/new?id=7` used to fill
+   * `id` and silently put the page into edit mode for someone else's entry.
+   * Route data outranks both, so this is the authoritative answer.
+   */
+  readonly mode = input<'create' | 'edit'>('create');
+
+  protected readonly isEdit = computed(() => this.mode() === 'edit');
+
   protected readonly blogId = computed(() => {
-    const raw = this.id();
-    return raw === undefined ? null : Number(raw);
+    if (!this.isEdit()) return null;
+    const parsed = Number(this.id());
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
   });
-  protected readonly isEdit = computed(() => this.blogId() !== null);
 
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);

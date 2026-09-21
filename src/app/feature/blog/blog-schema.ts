@@ -30,6 +30,19 @@ z.config({ jitless: true });
  * BlogService, which static analysis cannot follow. A plain import would pull
  * zod into the initial bundle — the very thing this split avoids.
  */
+/**
+ * A date string the `DatePipe` can actually render.
+ *
+ * Angular's `toDate()` throws RuntimeError 2311 for a non-empty string it
+ * cannot parse, and that happens inside change detection — one malformed
+ * `createdAt` from the backend would take down the whole overview. An empty
+ * string is the pipe's own "render nothing" case, so that is the fallback.
+ */
+const isoDate = z
+  .string()
+  .default('')
+  .transform((value) => (value && !Number.isNaN(Date.parse(value)) ? value : ''));
+
 export const blogSchema = z.object({
   id: z.number(),
   title: z.string(),
@@ -47,8 +60,8 @@ export const blogSchema = z.object({
     .string()
     .nullish()
     .transform((value) => (value && /^https:\/\//i.test(value) ? value : undefined)),
-  createdAt: z.string().default(''),
-  updatedAt: z.string().default(''),
+  createdAt: isoDate,
+  updatedAt: isoDate,
 });
 
 /**
