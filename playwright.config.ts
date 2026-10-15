@@ -8,7 +8,10 @@ export default defineConfig({
   reporter: 'html',
   use: {
     baseURL: 'http://localhost:4200',
-    trace: 'on-first-retry',
+    // Retries are off, so 'on-first-retry' would never record anything. Keep
+    // evidence of a failure instead: a trace to replay it, a screenshot to see it.
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
   },
   projects: [
     {
@@ -17,7 +20,12 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: process.env['CI'] ? 'npm run serve:e2e' : 'npm run start',
+    // The production bundle in both places. `ng serve` would run the
+    // development configuration, where authEnabled is true — the write routes
+    // would then redirect to /login instead of /blogs and the guard
+    // assertions would fail locally while passing in CI. CI builds in an
+    // earlier step, so only the local run needs the build chained on.
+    command: process.env['CI'] ? 'npm run serve:e2e' : 'npm run build && npm run serve:e2e',
     url: 'http://localhost:4200',
     reuseExistingServer: !process.env['CI'],
   },
