@@ -104,6 +104,32 @@ describe('BlogService (backend gateway)', () => {
       expect(await promise).toEqual([]);
     });
 
+    // The edge cases the worksheet asks about (null, empty, nonsense) belong
+    // here: this gateway is where untrusted data enters, so the layers behind
+    // it can rely on getting a Blog[] — never null, never a string. HttpClient
+    // itself delivers `null` for an empty body, and never `undefined`.
+    it.each([
+      ['null (an empty response body)', null],
+      ['a plain string', 'Service Unavailable'],
+      ['a number', 42],
+      ['an empty array', []],
+      ['an envelope around nothing', { data: [] }],
+    ])('returns an empty list for %s instead of throwing', async (_label, payload) => {
+      const promise = service.getBlogs();
+      httpMock.expectOne(API).flush(payload);
+
+      expect(await promise).toEqual([]);
+    });
+
+    it('skips null and primitive items but keeps the valid entry next to them', async () => {
+      const promise = service.getBlogs();
+      httpMock.expectOne(API).flush([null, 'x', 5, entry({ id: 9 })]);
+
+      const blogs = await promise;
+      expect(blogs).toHaveLength(1);
+      expect(blogs[0].id).toBe(9);
+    });
+
     it('rejects when the backend fails, instead of swallowing the error', async () => {
       const promise = service.getBlogs();
       httpMock.expectOne(API).flush('boom', { status: 500, statusText: 'Server Error' });

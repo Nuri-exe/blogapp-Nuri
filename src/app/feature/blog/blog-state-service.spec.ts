@@ -354,4 +354,183 @@ describe('BlogStateService', () => {
       expect(service.getById(1)).toMatchObject({ likedByMe: false, likes: 3 });
     });
   });
+
+  // ------------------------------------------------------------------------
+  // Signal testing: computed() follows its source, effect() runs its side effect
+  // ------------------------------------------------------------------------
+
+  describe('blogCount (computed)', () => {
+    it('follows its source: three entries, then none', async () => {
+      backend.getBlogs.mockResolvedValue([blog({ id: 1 }), blog({ id: 2 }), blog({ id: 3 })]);
+      const service = createService();
+      await service.loadBlogs();
+      expect(service.blogCount()).toBe(3);
+
+      backend.getBlogs.mockResolvedValue([]);
+      await service.loadBlogs();
+
+      expect(service.blogCount()).toBe(0);
+      // An empty list is a valid answer from the API, not a failure.
+      expect(service.error()).toBeNull();
+      expect(service.offline()).toBe(false);
+    });
+
+    it('counts the whole list while a filter narrows what is shown', async () => {
+      backend.getBlogs.mockResolvedValue([
+        blog({ id: 1, author: 'Maria Keller' }),
+        blog({ id: 2, author: 'Jonas Müller' }),
+        blog({ id: 3, author: 'Maria Keller' }),
+      ]);
+      const service = createService();
+      await service.loadBlogs();
+
+      service.setAuthor('Maria Keller');
+
+      expect(service.filteredBlogs()).toHaveLength(2);
+      expect(service.blogCount()).toBe(3);
+    });
+
+    it('derives the author list again after a reload with different entries', async () => {
+      backend.getBlogs.mockResolvedValue([blog({ author: 'Maria Keller' })]);
+      const service = createService();
+      await service.loadBlogs();
+      expect(service.authors()).toEqual(['Maria Keller']);
+
+      backend.getBlogs.mockResolvedValue([blog({ id: 2, author: 'Jonas Müller' })]);
+      await service.loadBlogs();
+
+      expect(service.authors()).toEqual(['Jonas Müller']);
+    });
+
+    // The filter outlives the data it was chosen from: a stored author may have
+    // no entries any more. The list is empty, the total is not — the overview
+    // relies on that difference to say "no posts by this author" instead of
+    // "no posts yet".
+    it('stays non-zero when the restored author has no entries any more', async () => {
+      localStorage.setItem(STORAGE_KEY, 'Ehemaliger Autor');
+      backend.getBlogs.mockResolvedValue([blog({ id: 1 }), blog({ id: 2 })]);
+      const service = createService();
+      await service.loadBlogs();
+
+      expect(service.filteredBlogs()).toEqual([]);
+      expect(service.blogCount()).toBe(2);
+    });
+  });
+
+  describe('persistence (effect)', () => {
+    /**
+     * A storage the test fully controls, installed as the global.
+     *
+     * Not `vi.spyOn(Storage.prototype, 'setItem')`: that works in jsdom but not
+     * in an environment that hands out no localStorage (our CI on Node 26, where
+     * test-setup.ts installs a plain object). And not `vi.spyOn(localStorage, …)`
+     * either: jsdom turns an assignment on a Storage into a stored *item*. Swapping
+     * the global behaves identically in both — see docs/testing.md.
+     */
+    function fakeStorage(initial: Record<string, string> = {}) {
+      const data = new Map(Object.entries(initial));
+      const storage = {
+        getItem: vi.fn((key: string) => data.get(key) ?? null),
+        setItem: vi.fn((key: string, value: string) => {
+          data.set(key, value);
+        }),
+        removeItem: vi.fn((key: string) => {
+          data.delete(key);
+        }),
+        clear: vi.fn(() => data.clear()),
+        key: vi.fn((index: number) => [...data.keys()][index] ?? null),
+        get length() {
+          return data.size;
+        },
+      };
+      vi.stubGlobal('localStorage', storage);
+      return storage;
+    }
+
+    afterEach(() => vi.unstubAllGlobals());
+
+    it('does nothing until the effect has been flushed', () => {
+      const storage = fakeStorage();
+
+      createService();
+
+      // Effects are scheduled, not synchronous — this is why a test has to
+      // flush them with TestBed.tick() before it looks for the side effect.
+      expect(storage.setItem).not.toHaveBeenCalled();
+    });
+
+    it('writes the initial filter once the effect has run', () => {
+      const storage = fakeStorage();
+      createService();
+
+      TestBed.tick();
+
+      expect(storage.setItem).toHaveBeenCalledTimes(1);
+      expect(storage.setItem).toHaveBeenCalledWith(STORAGE_KEY, ALL_AUTHORS);
+    });
+
+    it('writes again with the new value when the author changes', () => {
+      const storage = fakeStorage();
+      const service = createService();
+      TestBed.tick();
+
+      service.setAuthor('Maria Keller');
+      TestBed.tick();
+
+      expect(storage.setItem).toHaveBeenCalledTimes(2);
+      expect(storage.setItem).toHaveBeenLastCalledWith(STORAGE_KEY, 'Maria Keller');
+    });
+
+    it('ignores state changes that are not the filter', async () => {
+      const storage = fakeStorage();
+      backend.getBlogs.mockResolvedValue([blog()]);
+      const service = createService();
+      TestBed.tick();
+
+      // loading and blogs change here; the effect only reads selectedAuthor.
+      await service.loadBlogs();
+      TestBed.tick();
+
+      expect(storage.setItem).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not write again when the same author is chosen twice', () => {
+      const storage = fakeStorage();
+      const service = createService();
+      TestBed.tick();
+
+      service.setAuthor('Maria Keller');
+      TestBed.tick();
+      service.setAuthor('Maria Keller');
+      TestBed.tick();
+
+      // computed() compares by value, so an unchanged result never wakes the effect.
+      expect(storage.setItem).toHaveBeenCalledTimes(2);
+    });
+
+    it('survives a storage that refuses writes (private mode, quota)', () => {
+      const storage = fakeStorage();
+      storage.setItem.mockImplementation(() => {
+        throw new DOMException('The quota has been exceeded.', 'QuotaExceededError');
+      });
+      const service = createService();
+
+      expect(() => {
+        service.setAuthor('Maria Keller');
+        TestBed.tick();
+      }).not.toThrow();
+      expect(service.selectedAuthor()).toBe('Maria Keller');
+    });
+
+    it('falls back to "all" when the stored value cannot be read', () => {
+      const storage = fakeStorage();
+      storage.getItem.mockImplementation(() => {
+        throw new DOMException('Access is denied.', 'SecurityError');
+      });
+
+      const service = createService();
+
+      expect(service.selectedAuthor()).toBe(ALL_AUTHORS);
+    });
+  });
 });
