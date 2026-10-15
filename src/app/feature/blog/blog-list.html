@@ -26,10 +26,12 @@
 
     <p class="blog-list__count">{{ blogs().length }} von {{ blogCount() }} Beiträgen</p>
 
-    <a mat-stroked-button routerLink="/blogs/create" class="blog-list__compose">
-      <mat-icon>edit_note</mat-icon>
-      <span>Schreiben</span>
-    </a>
+    @if (auth.canWrite()) {
+      <a mat-stroked-button routerLink="/blogs/create" class="blog-list__compose">
+        <mat-icon>edit_note</mat-icon>
+        <span>Schreiben</span>
+      </a>
+    }
   </div>
 
   @if (offline()) {
@@ -55,7 +57,7 @@
   } @else {
     <div class="blog-list__grid">
       @for (b of blogs(); track b.id) {
-        <app-blog-card [blog]="b" (like)="onLike($event)" />
+        <app-blog-card class="blog-list__card" [blog]="b" (like)="onLike($event)" />
       } @empty {
         <p class="blog-list__empty">
           @if (blogCount() === 0) {

@@ -1,0 +1,26 @@
+@use '../../styles/variables' as v;
+
+.shell {
+  height: 100%;
+
+  &__drawer {
+    width: min(280px, 85vw);
+    background-color: var(--mat-sys-surface-container);
+    color: var(--mat-sys-on-surface);
+  }
+
+  // Mobile half of the responsive navigation: the links stack along the
+  // vertical axis. The toolbar half (row) is in header.scss.
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    padding-block: v.$spacing-sm;
+  }
+
+  // Column layout so the routed page can stretch to the bottom of the
+  // scroll area even when it is shorter than the viewport.
+  &__content {
+    display: flex;
+    flex-direction: column;
+  }
+}

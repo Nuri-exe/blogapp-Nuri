@@ -18,17 +18,21 @@ export const routes: Routes = [
     path: 'blogs/new',
     canMatch: [authGuard],
     loadComponent: () => import('./feature/blog/blog-form').then((m) => m.BlogForm),
+    // Route data beats query parameters in withComponentInputBinding()'s merge,
+    // so '?id=7' cannot talk this page into editing an existing entry.
+    data: { mode: 'create' },
     title: 'Neuer Beitrag — HFTM Blog',
   },
   // Same reason as 'blogs/new' above — must stay ahead of 'blogs/:id'.
   //
-  // Deliberately without authGuard, unlike the two routes around it: this build
-  // ships with authEnabled = false, so the guard would redirect every visitor
-  // and the form would be unreachable in the deployed app. Nothing is exposed by
-  // leaving it open — the guard is UI polish, the BFF and the backend are what
-  // actually reject an unauthorised write.
+  // Guarded like every other write route. This used to be open so the form
+  // stayed reachable in a build without auth; the security audit (Kurstag 11)
+  // reverses that: a route that creates content is not public, whatever the
+  // build. Visitors are sent to /login — or to /blogs where no login exists —
+  // and the overview hides the "Schreiben" link accordingly.
   {
     path: 'blogs/create',
+    canMatch: [authGuard],
     loadComponent: () => import('./feature/blog/blog-create').then((m) => m.BlogCreate),
     title: 'Beitrag schreiben — HFTM Blog',
   },
@@ -42,6 +46,7 @@ export const routes: Routes = [
     path: 'blogs/:id/edit',
     canMatch: [authGuard],
     loadComponent: () => import('./feature/blog/blog-form').then((m) => m.BlogForm),
+    data: { mode: 'edit' },
     title: 'Beitrag bearbeiten — HFTM Blog',
   },
   {
